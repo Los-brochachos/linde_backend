@@ -1,4 +1,4 @@
-package com.linde.linde_backend.entities;
+package com.linde.linde_backend.entities.Trabajador;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

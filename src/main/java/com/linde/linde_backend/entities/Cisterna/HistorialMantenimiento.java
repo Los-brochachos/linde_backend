@@ -1,7 +1,9 @@
-package com.linde.linde_backend.entities;
+package com.linde.linde_backend.entities.Cisterna;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import com.linde.linde_backend.entities.Trabajador.Tecnico;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

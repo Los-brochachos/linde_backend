@@ -1,6 +1,8 @@
-package com.linde.linde_backend.entities;
+package com.linde.linde_backend.entities.Cisterna;
 
 import java.time.LocalDateTime;
+
+import com.linde.linde_backend.entities.Trabajador.Conductor;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,26 +19,27 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity  
+@Entity 
 @Getter 
 @Setter 
 @Builder 
-@Table (name = "alerta")
+@Table (name = "falla")
 @NoArgsConstructor 
 @AllArgsConstructor 
-public class Alerta {
+public class Falla {
     @Id 
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private Integer idAlerta;
-    @Column (nullable = false, length = 50)
-    private String tipo;
-    @Column (nullable = false, length = 250)
-    private String mensaje;
+    private Integer idFalla;
+    @Column (nullable=false, length=250)
+    private String descripcion; 
     @Column (nullable = false)
     private LocalDateTime fechaHora;
     @Column (nullable = false, length = 50)
     private String estado;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn (name="idAtencion",nullable = false)
-    private Atencion atencion;
+    @ManyToOne (fetch = FetchType.LAZY)
+    @JoinColumn (name = "idCisterna", nullable = false)
+    private Cisterna cisterna;
+    @ManyToOne (fetch=FetchType.LAZY)
+    @JoinColumn (name = "idConductor", nullable = false) 
+    private Conductor conductor;
 }

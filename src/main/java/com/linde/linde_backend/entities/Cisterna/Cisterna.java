@@ -1,4 +1,6 @@
-package com.linde.linde_backend.entities;
+package com.linde.linde_backend.entities.Cisterna;
+
+import java.math.BigDecimal;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -7,33 +9,26 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity 
-@Table(name = "Usuario")
+@Entity
 @Getter 
-@Setter 
+@Setter
+@Builder
+@Table (name = "cisterna")
 @NoArgsConstructor 
-@AllArgsConstructor
-public class Usuario {
-
+@AllArgsConstructor 
+public class Cisterna {
     @Id 
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private Integer idUsuario;
-    
-
-    @Column (nullable = false, length = 100)
-    private String correo;
-
-    @Column (nullable = false, length = 100)
-    private String contraseña;
-
-    @Column (nullable = false, length = 50)
-    private String rol;
-
-    @Column (nullable =false, length = 20)
+    private Integer idCisterna;
+    @Column (nullable = false, length = 20)
+    private String placa;
+    @Column (nullable = false, precision = 10, scale = 2)
+    private BigDecimal capacidad;
+    @Column (nullable = false, length = 20)
     private String estado;
-
 }

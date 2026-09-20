@@ -1,6 +1,8 @@
-package com.linde.linde_backend.entities;
+package com.linde.linde_backend.entities.Pedido;
 
 import java.time.LocalDate;
+
+import com.linde.linde_backend.entities.Cliente.Cliente;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,22 +23,22 @@ import lombok.Setter;
 @Getter 
 @Setter 
 @Builder 
-@Table (name = "factura")
+@Table (name="pedido")
 @NoArgsConstructor 
 @AllArgsConstructor 
-public class Factura {
+public class Pedido {
     @Id 
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private Integer idFactura;
-    @Column (nullable = false, length = 50)
-    private String numero;
+    @GeneratedValue (strategy= GenerationType.IDENTITY)
+    private Integer idPedido;
     @Column (nullable = false)
-    private LocalDate fechaEmision;
-    @Column (nullable = false, length = 30)
-    private String tipoComprobante;
-    @Column (nullable = false, length = 10)
-    private String moneda;
-    @ManyToOne (fetch=FetchType.LAZY)
-    @JoinColumn (name = "idPedido", nullable = false)
-    private Pedido pedido;
+    private LocalDate fechaRegistro;
+    @Column (nullable = false, length = 50)
+    private String estado;
+    @Column
+    private LocalDate fechaEntregaEstimada;
+    @Column (length = 20)
+    private String prioridad; 
+    @ManyToOne (fetch= FetchType.LAZY)
+    @JoinColumn (name = "idCliente", nullable = false)
+    private Cliente cliente;
 }

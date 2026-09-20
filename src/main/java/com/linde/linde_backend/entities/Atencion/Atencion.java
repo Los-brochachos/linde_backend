@@ -1,6 +1,11 @@
-package com.linde.linde_backend.entities;
+package com.linde.linde_backend.entities.Atencion;
 
 import java.time.LocalDateTime;
+
+import com.linde.linde_backend.entities.Cisterna.Cisterna;
+import com.linde.linde_backend.entities.Pedido.Pedido;
+import com.linde.linde_backend.entities.Trabajador.Conductor;
+import com.linde.linde_backend.entities.Trabajador.Programador;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,7 +23,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity 
-@Getter 
+@Getter
 @Setter 
 @Builder 
 @Table (name="atencion")

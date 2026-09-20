@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.linde.linde_backend.entities.Usuario;
+import com.linde.linde_backend.entities.Usuario.Usuario;
 import com.linde.linde_backend.repositories.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;

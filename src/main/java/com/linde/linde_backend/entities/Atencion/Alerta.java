@@ -1,6 +1,6 @@
-package com.linde.linde_backend.entities;
+package com.linde.linde_backend.entities.Atencion;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,26 +17,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity 
+@Entity  
 @Getter 
 @Setter 
 @Builder 
-@Table (name="pedido")
+@Table (name = "alerta")
 @NoArgsConstructor 
 @AllArgsConstructor 
-public class Pedido {
+public class Alerta {
     @Id 
-    @GeneratedValue (strategy= GenerationType.IDENTITY)
-    private Integer idPedido;
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    private Integer idAlerta;
+    @Column (nullable = false, length = 50)
+    private String tipo;
+    @Column (nullable = false, length = 250)
+    private String mensaje;
     @Column (nullable = false)
-    private LocalDate fechaRegistro;
+    private LocalDateTime fechaHora;
     @Column (nullable = false, length = 50)
     private String estado;
-    @Column
-    private LocalDate fechaEntregaEstimada;
-    @Column (length = 20)
-    private String prioridad; 
-    @ManyToOne (fetch= FetchType.LAZY)
-    @JoinColumn (name = "idCliente", nullable = false)
-    private Cliente cliente;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn (name="idAtencion",nullable = false)
+    private Atencion atencion;
 }

@@ -1,6 +1,8 @@
-package com.linde.linde_backend.entities;
+package com.linde.linde_backend.entities.Trabajador;
 
 import java.time.LocalDate;
+
+import com.linde.linde_backend.entities.Usuario.Usuario;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

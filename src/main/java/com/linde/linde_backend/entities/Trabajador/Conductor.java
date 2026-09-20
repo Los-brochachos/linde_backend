@@ -1,4 +1,6 @@
-package com.linde.linde_backend.entities;
+package com.linde.linde_backend.entities.Trabajador;
+
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,24 +16,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity 
-@Table(name = "programador")
+@Entity
 @Getter 
 @Setter 
 @Builder 
+@Table (name = "conductor")
 @NoArgsConstructor 
 @AllArgsConstructor 
-public class Programador {
-    @Id
+public class Conductor {
+    @Id 
     private Integer idTrabajador;
+    @OneToOne (fetch = FetchType.LAZY)
+    @MapsId 
+    @JoinColumn (name="idTrabajador")
+    private Trabajador trabajador; 
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "idTrabajador")
-    private Trabajador trabajador;
-
-    @Column (nullable = false, length = 100)
-    private String area;
     @Column (nullable = false, length = 30)
-    private String turno;
+    private String licenciaConducir;
+    @Column (nullable = false, length = 30)
+    private String categoriaLicencia;
+    @Column (nullable = false)
+    private LocalDate fechaVencimientoLicencia;
 }
