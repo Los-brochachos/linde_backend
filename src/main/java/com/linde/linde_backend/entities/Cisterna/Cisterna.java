@@ -27,8 +27,11 @@ public class Cisterna {
     private Integer idCisterna;
     @Column (nullable = false, length = 20)
     private String placa;
+    @Column (nullable = false, length = 100, unique = true)
+    private String nombre;
     @Column (nullable = false, precision = 10, scale = 2)
     private BigDecimal capacidad;
     @Column (nullable = false, length = 20)
     private String estado;
+
 }
