@@ -1,8 +1,8 @@
-package com.linde.linde_backend.entities.Cisterna;
+package com.linde.linde_backend.entities.cisterna;
 
 import java.time.LocalDateTime;
 
-import com.linde.linde_backend.entities.Trabajador.Conductor;
+import com.linde.linde_backend.entities.trabajador.Conductor;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

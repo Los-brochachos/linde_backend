@@ -1,4 +1,4 @@
-package com.linde.linde_backend.entities.Atencion;
+package com.linde.linde_backend.entities.atencion;
 
 import java.time.LocalDateTime;
 

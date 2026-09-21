@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.linde.linde_backend.entities.Cisterna.HistorialMantenimiento;
+import com.linde.linde_backend.entities.cisterna.HistorialMantenimiento;
 
 public interface HistorialMantenimientoRepository extends JpaRepository<HistorialMantenimiento, Integer>{
     @EntityGraph(attributePaths = {"cisterna", "tecnico"})

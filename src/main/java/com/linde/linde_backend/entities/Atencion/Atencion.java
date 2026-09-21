@@ -1,11 +1,11 @@
-package com.linde.linde_backend.entities.Atencion;
+package com.linde.linde_backend.entities.atencion;
 
 import java.time.LocalDateTime;
 
-import com.linde.linde_backend.entities.Trabajador.Conductor;
-import com.linde.linde_backend.entities.Trabajador.Programador;
 import com.linde.linde_backend.entities.cisterna.Cisterna;
 import com.linde.linde_backend.entities.pedido.Pedido;
+import com.linde.linde_backend.entities.trabajador.Conductor;
+import com.linde.linde_backend.entities.trabajador.Programador;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
