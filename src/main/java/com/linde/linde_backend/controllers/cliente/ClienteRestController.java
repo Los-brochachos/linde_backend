@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping ("api/cliente")
 @RequiredArgsConstructor //para la inyeccion de dependencias
 
-public class ClienteController {
+public class ClienteRestController {
     private final ClienteService clienteS ; 
     //metodo para mostrar al cliente y crear al cliente 
     @GetMapping //mostar
