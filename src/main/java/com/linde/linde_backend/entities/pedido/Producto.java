@@ -1,4 +1,4 @@
-package com.linde.linde_backend.entities.Pedido;
+package com.linde.linde_backend.entities.pedido;
 
 import java.math.BigDecimal;
 
