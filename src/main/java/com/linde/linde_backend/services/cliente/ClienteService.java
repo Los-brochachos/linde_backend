@@ -1,32 +1,32 @@
-package com.linde.linde_backend.services.Cliente;
+package com.linde.linde_backend.services.cliente;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.linde.linde_backend.entities.Cliente.cliente;
-import com.linde.linde_backend.repositories.Cliente.clienteRepository;
+import com.linde.linde_backend.entities.cliente.Cliente;
+import com.linde.linde_backend.repositories.cliente.ClienteRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Service 
 @RequiredArgsConstructor 
  
-public class clienteServices {
+public class ClienteService {
     //referencia 
-    private final clienteRepository clienteRepository;
+    private final ClienteRepository clienteRepository;
     //listar
-    public List <cliente>listarClientes(){
+    public List <Cliente>listarClientes(){
         return clienteRepository.findAll();
     }
     //buscar
-    public cliente buscarCliente (Integer id){
+    public Cliente buscarCliente (Integer id){
         return clienteRepository.findById(id).orElse(null);
     
     }
 
     //guardar
-    public cliente guarCliente(cliente cliente){
+    public Cliente guarCliente(Cliente cliente){
         return clienteRepository.save(cliente);
 
     }

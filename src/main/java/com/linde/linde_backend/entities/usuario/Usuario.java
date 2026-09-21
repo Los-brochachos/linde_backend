@@ -53,9 +53,9 @@ public class Usuario implements UserDetails{
     private RolesEnum rol;
 
 
-    @Override 
-    public Collection<? extends GrantedAuthority> getAuthorities(){
-        return List.of(new SimpleGrantedAuthority(rol.name()));
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + rol.name()));
     }
 
     @Override

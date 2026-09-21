@@ -1,6 +1,6 @@
-package com.linde.linde_backend.entities.Cliente;
+package com.linde.linde_backend.entities.cliente;
 
-import com.linde.linde_backend.entities.Usuario.Usuario;
+import com.linde.linde_backend.entities.usuario.Usuario;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

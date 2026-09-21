@@ -34,7 +34,7 @@ public class AuthService {
     var user = Usuario.builder()
         .correo(request.correo())
         .contraseña(passwordEncoder.encode(request.contraseña()))
-        .rol(RolesEnum.USER)
+        .rol(RolesEnum.CLIENTE)
         .estado(EstadoUsuario.ACTIVO)
         .build();
     userRepository.save(user).getCorreo();
