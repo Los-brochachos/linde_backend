@@ -1,4 +1,4 @@
-package com.linde.linde_backend.entities.cisterna;
+package com.linde.linde_backend.entities.Cisterna;
 
 import java.math.BigDecimal;
 

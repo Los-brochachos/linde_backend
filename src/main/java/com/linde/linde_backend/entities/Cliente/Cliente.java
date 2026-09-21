@@ -1,4 +1,4 @@
-package com.linde.linde_backend.entities.cliente;
+package com.linde.linde_backend.entities.Cliente;
 
 import com.linde.linde_backend.entities.usuario.Usuario;
 

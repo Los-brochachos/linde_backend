@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.linde.linde_backend.entities.cisterna.Cisterna;
+import com.linde.linde_backend.entities.Cisterna.Cisterna;
 import com.linde.linde_backend.repositories.CisternaRepository;
 
 import jakarta.transaction.Transactional;

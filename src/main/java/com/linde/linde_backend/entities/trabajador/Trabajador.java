@@ -1,4 +1,4 @@
-package com.linde.linde_backend.entities.trabajador;
+package com.linde.linde_backend.entities.Trabajador;
 
 import java.time.LocalDate;
 
