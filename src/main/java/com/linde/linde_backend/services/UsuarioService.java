@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.linde.linde_backend.entities.usuario.Usuario;
-import com.linde.linde_backend.repositories.UsuarioRepository;
+import com.linde.linde_backend.repositories.usuario.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
 

@@ -1,4 +1,4 @@
-package com.linde.linde_backend.controllers;
+package com.linde.linde_backend.controllers.usuario;
 
 import java.util.List;
 

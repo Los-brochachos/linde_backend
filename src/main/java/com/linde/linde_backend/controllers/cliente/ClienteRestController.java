@@ -16,7 +16,7 @@ import com.linde.linde_backend.services.cliente.ClienteService;
 import lombok.RequiredArgsConstructor;
 
 @RestController 
-@RequestMapping ("api/cliente")
+@RequestMapping ("api/v1/cliente")
 @RequiredArgsConstructor //para la inyeccion de dependencias
 
 public class ClienteRestController {

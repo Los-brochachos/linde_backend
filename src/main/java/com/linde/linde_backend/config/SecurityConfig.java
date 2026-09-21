@@ -45,6 +45,7 @@ public class SecurityConfig {
 
                 // Solo ADMIN
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/v1/trabajador/**").hasRole("ADMIN")
 
                 // ADMIN y PROGRAMADOR
                 .requestMatchers("/api/v1/programador/**")
