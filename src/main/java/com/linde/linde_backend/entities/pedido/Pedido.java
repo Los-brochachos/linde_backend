@@ -1,8 +1,8 @@
-package com.linde.linde_backend.entities.pedido;
+package com.linde.linde_backend.entities.Pedido;
 
 import java.time.LocalDate;
 
-import com.linde.linde_backend.entities.cliente.Cliente;
+import com.linde.linde_backend.entities.Cliente.Cliente;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
