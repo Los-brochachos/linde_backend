@@ -6,7 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.linde.linde_backend.entities.usuario.Usuario;
-import com.linde.linde_backend.repositories.UsuarioRepository;
+import com.linde.linde_backend.repositories.usuario.UsuarioRepository;
 import com.linde.linde_backend.utils.AuthRequest;
 import com.linde.linde_backend.utils.AuthResponse;
 import com.linde.linde_backend.utils.EstadoUsuario;
@@ -34,7 +34,7 @@ public class AuthService {
     var user = Usuario.builder()
         .correo(request.correo())
         .contraseña(passwordEncoder.encode(request.contraseña()))
-        .rol(RolesEnum.USER)
+        .rol(RolesEnum.CLIENTE)
         .estado(EstadoUsuario.ACTIVO)
         .build();
     userRepository.save(user).getCorreo();

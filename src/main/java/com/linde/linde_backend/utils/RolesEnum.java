@@ -1,8 +1,9 @@
 package com.linde.linde_backend.utils;
 
 public enum RolesEnum {
-    USER,
-    ADMIN
-
-    
+    ADMIN,
+    PROGRAMADOR,
+    CONDUCTOR,
+    TECNICO,
+    CLIENTE
 }

@@ -1,5 +1,11 @@
 package com.linde.linde_backend.utils;
 
-public record RefreshTokenRequest(String refreshToken) {
+import jakarta.validation.constraints.NotBlank;
 
+public record RefreshTokenRequest(
+
+    @NotBlank(message = "El refresh token es obligatorio")
+    String refreshToken
+
+) {
 }

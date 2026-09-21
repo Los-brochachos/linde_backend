@@ -40,10 +40,34 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .cors(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth
+                // Públicos: no necesitan token
                 .requestMatchers("/auth/**", "/info/**").permitAll()
-                .requestMatchers("/demo/user/**").hasAnyAuthority("USER", "ADMIN")
-                .requestMatchers("/demo/admin/**").hasAuthority("ADMIN")
-                .anyRequest().authenticated())
+
+                // Solo ADMIN
+                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/v1/trabajador/**").hasRole("ADMIN")
+
+                // ADMIN y PROGRAMADOR
+                .requestMatchers("/api/v1/programador/**")
+                    .hasAnyRole("ADMIN", "PROGRAMADOR")
+
+                // ADMIN y CONDUCTOR
+                .requestMatchers("/api/v1/conductor/**")
+                    .hasAnyRole("ADMIN", "CONDUCTOR")
+
+                // ADMIN y TECNICO
+                .requestMatchers("/api/v1/tecnico/**")
+                    .hasAnyRole("ADMIN", "TECNICO")
+
+                // ADMIN y CLIENTE
+                .requestMatchers("/api/v1/cliente/**")
+                    .hasAnyRole("ADMIN", "CLIENTE")
+
+                // Todo lo demás necesita estar autenticado
+                .anyRequest().authenticated()
+        
+            
+            )
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 

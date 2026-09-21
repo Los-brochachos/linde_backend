@@ -1,4 +1,4 @@
-package com.linde.linde_backend.repositories;
+package com.linde.linde_backend.repositories.usuario;
 
 import java.util.Optional;
 

@@ -36,10 +36,15 @@ public class JwtService {
   }
 
   private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expirationMillis) {
+    
     return Jwts
         .builder()
         .claims(extraClaims)
         .subject(userDetails.getUsername())
+        .claim("role", userDetails.getAuthorities().stream()
+          .findFirst()
+          .map(authority -> authority.getAuthority())
+          .orElse(""))
         .issuedAt(new Date(System.currentTimeMillis()))
         .expiration(new Date(System.currentTimeMillis() + expirationMillis))
         .signWith(secretKey)

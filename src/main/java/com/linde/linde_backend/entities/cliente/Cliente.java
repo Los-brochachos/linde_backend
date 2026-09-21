@@ -1,6 +1,7 @@
 package com.linde.linde_backend.entities.cliente;
 
 import com.linde.linde_backend.entities.usuario.Usuario;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -20,31 +21,24 @@ import lombok.Setter;
 @Getter 
 @Setter 
 @Builder 
-@Table(name = "cliente")
+@Table (name = "cliente")
 @AllArgsConstructor 
 @NoArgsConstructor 
 public class Cliente {
-
     @Id 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Integer idCliente;
-
-    @Column(nullable = false, length = 20)
+    @Column (nullable = false, length = 20)
     private String ruc;
-
-    @Column(nullable = false, length = 100)
+    @Column (nullable = false, length = 100)
     private String razonSocial;
-
-    @Column(length = 150)
+    @Column (length = 150)
     private String direccion;
-
-    @Column(length = 20)
+    @Column (length = 20)
     private String telefono;
-
-    @Column(length = 100)
+    @Column (length = 100)
     private String correo;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idUsuario", nullable = false)
+    @OneToOne (fetch = FetchType.LAZY)
+    @JoinColumn (name = "idUsuario", nullable = false)
     private Usuario usuario;
 }
