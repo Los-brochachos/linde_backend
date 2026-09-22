@@ -1,6 +1,6 @@
 package com.linde.linde_backend.dto.usuario;
 
-import com.linde.linde_backend.utils.EstadoUsuario;
+import com.linde.linde_backend.utils.Estado;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -15,6 +15,6 @@ public record UsuarioUpdateRequest(
     String correo,
 
     @NotNull(message = "El estado es obligatorio")
-    EstadoUsuario estado
+    Estado estado
 
 ) {}

@@ -12,7 +12,6 @@ import com.linde.linde_backend.entities.trabajador.Trabajador;
 import com.linde.linde_backend.mapper.trabajador.ProgramadorMapper;
 import com.linde.linde_backend.repositories.trabajador.ProgramadorRepository;
 import com.linde.linde_backend.repositories.trabajador.TrabajadorRepository;
-import com.linde.linde_backend.utils.EstadoUsuario;
 import com.linde.linde_backend.utils.RolesEnum;
 
 import lombok.RequiredArgsConstructor;
@@ -90,19 +89,5 @@ public class ProgramadorService {
         return programadorMapper.toResponse(programador);
     }
 
-    @Transactional
-    public void desactivar(Integer idTrabajador) {
 
-        Programador programador = programadorRepository.findById(idTrabajador)
-                .orElseThrow(() -> new RuntimeException(
-                        "Programador no encontrado"
-                ));
-
-        Trabajador trabajador = programador.getTrabajador();
-
-        trabajador.setEstado("INACTIVO");
-        trabajador.getUsuario().setEstado(EstadoUsuario.INACTIVO);
-
-        trabajadorRepository.save(trabajador);
-    }
 }

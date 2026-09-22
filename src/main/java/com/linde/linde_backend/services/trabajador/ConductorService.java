@@ -12,7 +12,6 @@ import com.linde.linde_backend.entities.trabajador.Trabajador;
 import com.linde.linde_backend.mapper.trabajador.ConductorMapper;
 import com.linde.linde_backend.repositories.trabajador.ConductorRepository;
 import com.linde.linde_backend.repositories.trabajador.TrabajadorRepository;
-import com.linde.linde_backend.utils.EstadoUsuario;
 import com.linde.linde_backend.utils.RolesEnum;
 
 import lombok.RequiredArgsConstructor;

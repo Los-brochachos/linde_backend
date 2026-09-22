@@ -12,7 +12,6 @@ import com.linde.linde_backend.entities.trabajador.Trabajador;
 import com.linde.linde_backend.mapper.trabajador.TecnicoMapper;
 import com.linde.linde_backend.repositories.trabajador.TecnicoRepository;
 import com.linde.linde_backend.repositories.trabajador.TrabajadorRepository;
-import com.linde.linde_backend.utils.EstadoUsuario;
 import com.linde.linde_backend.utils.RolesEnum;
 
 import lombok.RequiredArgsConstructor;
@@ -98,21 +97,4 @@ public class TecnicoService {
         return tecnicoMapper.toResponse(tecnico);
     }
 
-    @Transactional
-    public void desactivar(Integer idTrabajador) {
-
-        Tecnico tecnico = tecnicoRepository.findById(idTrabajador)
-                .orElseThrow(() -> new RuntimeException(
-                        "Técnico no encontrado"
-                ));
-
-        Trabajador trabajador = tecnico.getTrabajador();
-
-        trabajador.setEstado("INACTIVO");
-        trabajador.getUsuario().setEstado(
-                EstadoUsuario.INACTIVO
-        );
-
-        trabajadorRepository.save(trabajador);
-    }
 }
