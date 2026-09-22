@@ -9,7 +9,7 @@ import com.linde.linde_backend.entities.usuario.Usuario;
 import com.linde.linde_backend.repositories.usuario.UsuarioRepository;
 import com.linde.linde_backend.utils.AuthRequest;
 import com.linde.linde_backend.utils.AuthResponse;
-import com.linde.linde_backend.utils.EstadoUsuario;
+import com.linde.linde_backend.utils.Estado;
 import com.linde.linde_backend.utils.RefreshTokenRequest;
 import com.linde.linde_backend.utils.RegisterRequest;
 import com.linde.linde_backend.utils.RegisterResponse;
@@ -35,7 +35,7 @@ public class AuthService {
         .correo(request.correo())
         .contraseña(passwordEncoder.encode(request.contraseña()))
         .rol(RolesEnum.CLIENTE)
-        .estado(EstadoUsuario.ACTIVO)
+        .estado(Estado.ACTIVO)
         .build();
     userRepository.save(user).getCorreo();
     return new RegisterResponse(request.correo(), "INFORMACIÓN", "Nuevo usuario registrado.");

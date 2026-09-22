@@ -13,7 +13,7 @@ import com.linde.linde_backend.entities.usuario.Usuario;
 import com.linde.linde_backend.mapper.trabajador.TrabajadorMapper;
 import com.linde.linde_backend.repositories.trabajador.TrabajadorRepository;
 import com.linde.linde_backend.repositories.usuario.UsuarioRepository;
-import com.linde.linde_backend.utils.EstadoUsuario;
+import com.linde.linde_backend.utils.Estado;
 
 import lombok.RequiredArgsConstructor;
 
@@ -55,7 +55,7 @@ public class TrabajadorService {
         Usuario usuario = Usuario.builder()
                 .correo(request.correo())
                 .contraseña(passwordEncoder.encode(request.contraseña()))
-                .estado(EstadoUsuario.valueOf(request.estado()))
+                .estado(request.estado())
                 .rol(request.rol())
                 .build();
 
@@ -72,9 +72,7 @@ public class TrabajadorService {
     }
 
     @Transactional
-    public TrabajadorResponse actualizar(
-            Integer id,
-            TrabajadorRequest request) {
+    public TrabajadorResponse actualizar(Integer id,TrabajadorRequest request) {
 
         validarRol(request);
 
@@ -101,7 +99,7 @@ public class TrabajadorService {
         trabajador.setEstado(request.estado());
 
         usuario.setCorreo(request.correo());
-        usuario.setEstado(EstadoUsuario.valueOf(request.estado()));
+        usuario.setEstado(request.estado());
         usuario.setRol(request.rol());
 
         if (request.contraseña() != null
@@ -128,8 +126,8 @@ public class TrabajadorService {
 
             Usuario usuario = trabajador.getUsuario();
 
-            trabajador.setEstado("INACTIVO");
-            usuario.setEstado(EstadoUsuario.INACTIVO);
+            trabajador.setEstado(Estado.INACTIVO);
+            usuario.setEstado(Estado.INACTIVO);
 
             trabajadorRepository.save(trabajador);
             usuarioRepository.save(usuario);
@@ -148,6 +146,7 @@ public class TrabajadorService {
             case CONDUCTOR:
             case TECNICO:
             case PROGRAMADOR:
+            case ANALISTA:
                 break;
         }
     }

@@ -2,6 +2,7 @@ package com.linde.linde_backend.dto.trabajador;
 
 import java.time.LocalDate;
 
+import com.linde.linde_backend.utils.Estado;
 import com.linde.linde_backend.utils.RolesEnum;
 
 import jakarta.validation.constraints.Email;
@@ -32,9 +33,8 @@ public record TrabajadorRequest(
     @NotNull(message = "La fecha de ingreso es obligatoria")
     LocalDate fechaIngreso,
 
-    @NotBlank(message = "El estado es obligatorio")
-    @Size(max = 20, message = "El estado no puede superar los 20 caracteres")
-    String estado,
+    @NotNull(message = "El estado es obligatorio")
+    Estado estado,
 
     @NotBlank(message = "El correo es obligatorio")
     @Email(message = "El correo debe tener un formato válido")

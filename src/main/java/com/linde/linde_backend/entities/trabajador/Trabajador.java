@@ -3,9 +3,12 @@ package com.linde.linde_backend.entities.trabajador;
 import java.time.LocalDate;
 
 import com.linde.linde_backend.entities.usuario.Usuario;
+import com.linde.linde_backend.utils.Estado;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -43,8 +46,9 @@ public class Trabajador {
     private String direccion;
     @Column (nullable = false)
     private LocalDate fechaIngreso;
-    @Column (nullable = false, length = 20)
-    private String estado;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Estado estado;
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn (name = "idUsuario", nullable = false)
     private Usuario usuario;

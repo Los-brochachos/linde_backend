@@ -2,6 +2,7 @@ package com.linde.linde_backend.dto.trabajador;
 
 import java.time.LocalDate;
 
+import com.linde.linde_backend.utils.Estado;
 import com.linde.linde_backend.utils.RolesEnum;
 
 public record TrabajadorResponse(
@@ -13,7 +14,7 @@ public record TrabajadorResponse(
     String telefono,
     String direccion,
     LocalDate fechaIngreso,
-    String estado,
+    Estado estado,
     Integer idUsuario,
     String correo,
     RolesEnum rol

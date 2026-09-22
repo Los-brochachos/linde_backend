@@ -5,5 +5,6 @@ public enum RolesEnum {
     PROGRAMADOR,
     CONDUCTOR,
     TECNICO,
-    CLIENTE
+    CLIENTE,
+    ANALISTA
 }
