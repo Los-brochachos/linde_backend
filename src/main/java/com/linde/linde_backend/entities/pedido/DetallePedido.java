@@ -28,13 +28,17 @@ public class DetallePedido {
     @Id 
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Integer idDetalle;
+
     @Column (nullable = false, precision = 10, scale = 2)
     private BigDecimal cantidad;
+
     @Column (nullable = false, precision = 10, scale = 2)
     private BigDecimal precioUnitario;
+
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn (name="idPedido", nullable = false)
     private Pedido pedido;
+    
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn (name = "idProducto", nullable = false)
     private Producto producto;
