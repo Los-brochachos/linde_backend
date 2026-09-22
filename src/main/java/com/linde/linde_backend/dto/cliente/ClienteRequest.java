@@ -1,11 +1,11 @@
-package com.linde.linde_backend.dto;
+package com.linde.linde_backend.dto.cliente;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public record ClienteRequeest(
+public record ClienteRequest(
     @NotBlank (message = "El Ruc es obligatorio") 
     @Pattern (regexp = "\\d{11}", message = ("El Ruc debe tener 11 caracteres"))
     String ruc,

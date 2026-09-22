@@ -23,14 +23,8 @@ import lombok.Setter;
 @Builder 
 @Table (name = "cliente")
 @AllArgsConstructor 
-<<<<<<< HEAD:src/main/java/com/linde/linde_backend/entities/Cliente/cliente.java
-@Builder 
-
-public class cliente {
-=======
 @NoArgsConstructor 
 public class Cliente {
->>>>>>> main:src/main/java/com/linde/linde_backend/entities/cliente/Cliente.java
     @Id 
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Integer idCliente;

@@ -1,4 +1,4 @@
-package com.linde.linde_backend.dto;
+package com.linde.linde_backend.dto.cliente;
 
 public record ClienteResponse(
         Integer id,
