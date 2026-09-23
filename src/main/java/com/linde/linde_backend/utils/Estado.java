@@ -1,6 +1,6 @@
 package com.linde.linde_backend.utils;
 
-public enum EstadoUsuario {
+public enum Estado {
     ACTIVO,
     INACTIVO
 

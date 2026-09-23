@@ -9,7 +9,6 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,36 +36,27 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable)
+            .csrf(csrf -> csrf.disable())
             .cors(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth
-                // Públicos: no necesitan token
-                .requestMatchers("/auth/**", "/info/**").permitAll()
 
-                // Solo ADMIN
-                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/v1/trabajador/**").hasRole("ADMIN")
+                .requestMatchers("/api/v1/auth/**")
+                    .permitAll()
 
-                // ADMIN y PROGRAMADOR
-                .requestMatchers("/api/v1/programador/**")
-                    .hasAnyRole("ADMIN", "PROGRAMADOR")
+                .requestMatchers("/api/v1/trabajador/**")
+                    .hasRole("ADMIN")
 
-                // ADMIN y CONDUCTOR
                 .requestMatchers("/api/v1/conductor/**")
-                    .hasAnyRole("ADMIN", "CONDUCTOR")
+                    .hasRole("ADMIN")
 
-                // ADMIN y TECNICO
                 .requestMatchers("/api/v1/tecnico/**")
-                    .hasAnyRole("ADMIN", "TECNICO")
+                    .hasRole("ADMIN")
 
-                // ADMIN y CLIENTE
-                .requestMatchers("/api/v1/cliente/**")
-                    .hasAnyRole("ADMIN", "CLIENTE")
+                .requestMatchers("/api/v1/programador/**")
+                    .hasRole("ADMIN")
 
-                // Todo lo demás necesita estar autenticado
-                .anyRequest().authenticated()
-        
-            
+                .anyRequest()
+                    .authenticated()
             )
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);

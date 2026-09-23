@@ -7,7 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.linde.linde_backend.utils.EstadoUsuario;
+import com.linde.linde_backend.utils.Estado;
 import com.linde.linde_backend.utils.RolesEnum;
 
 import jakarta.persistence.Column;
@@ -47,7 +47,7 @@ public class Usuario implements UserDetails{
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private EstadoUsuario estado;
+    private Estado estado;
 
     @Enumerated(EnumType.STRING)
     private RolesEnum rol;

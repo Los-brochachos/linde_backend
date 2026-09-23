@@ -20,7 +20,7 @@ import com.linde.linde_backend.services.CisternaService;
 
 
 @RestController 
-@RequestMapping ("api/v1/cisterna")
+@RequestMapping ("api/v1/cisternas")
 @RequiredArgsConstructor 
 public class CisternaRestController {
     private final CisternaService service;
