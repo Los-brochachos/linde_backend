@@ -1,14 +1,18 @@
 package com.linde.linde_backend.services.cisterna;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import com.linde.linde_backend.entities.cisterna.Falla;
-import com.linde.linde_backend.repositories.cisterna.CisternaRepository;
 import com.linde.linde_backend.repositories.cisterna.FallaRepository;
-import com.linde.linde_backend.repositories.ConductorRepository;
+import com.linde.linde_backend.repositories.cisterna.CisternaRepository;
+import com.linde.linde_backend.repositories.trabajador.ConductorRepository;
+import com.linde.linde_backend.dto.cisterna.EliminarFallaRequest;
+import com.linde.linde_backend.dto.cisterna.FallaRequest;
+import com.linde.linde_backend.dto.cisterna.FallaResponse;
 import com.linde.linde_backend.entities.cisterna.Cisterna;
 import com.linde.linde_backend.entities.trabajador.Conductor;
+import com.linde.linde_backend.mapper.cisterna.FallaMapper;
+
 import jakarta.transaction.Transactional;
 
 @Service 
@@ -17,39 +21,38 @@ public class FallaService {
     private final FallaRepository repository;
     private final CisternaRepository cisternaRepository;
     private final ConductorRepository conductorRepository;
+    private final FallaMapper mapper;
 
-    public List <Falla> listar(){
-        return repository.findAll();
+    public List <FallaResponse> listar(){
+        return repository.findAll().stream().map(mapper::toDto).toList();
     }
     
-    public final List<Falla> findByCisterna_IdCisterna (Integer id){
-        return repository.findByCisterna_IdCisterna(id);
+    public List<FallaResponse> findByCisterna_IdCisterna (Integer id){
+        return repository.findByCisterna_IdCisterna(id).stream().map(mapper::toDto).toList();
     }
 
     @Transactional 
-    public Falla create(String descripcion, LocalDateTime fechaHora, Integer idCisterna, Integer idConductor){
-        Cisterna cisterna= cisternaRepository.findById(idCisterna).orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("La cisterna no existe."));
-        Conductor conductor = conductorRepository.findById(idConductor)
-            .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("El conductor no existe."));
+    public FallaResponse create(FallaRequest request){
+        Cisterna cisterna= cisternaRepository.findById(request.idCisterna()).orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("La cisterna no existe."));
+        Conductor conductor = conductorRepository.findById(request.idTrabajador())
+            .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("El conductor no se encuentra registrado."));
+                
+        Falla falla=mapper.toEntity(request);
         
-        Falla nuevaFalla= Falla.builder()
-        .descripcion(descripcion)
-        .fechaHora(fechaHora)
-        .estado("PENDIENTE")
-        .cisterna(cisterna)
-        .conductor(conductor)
-        .build();
-        return repository.save(nuevaFalla);
+        falla.setCisterna(cisterna);
+        falla.setConductor(conductor);
+        return mapper.toDto(repository.save(falla));
     } 
 
     @Transactional
-    public Falla cambiarEstado(Integer idFalla){
-        return repository.findById(idFalla).map(
+    public FallaResponse cambiarEstado(EliminarFallaRequest request ){
+        return repository.findById(request.idFalla()).map(
             falla -> {
             falla.setEstado("SOLUCIONADO");
-            return repository.save(falla);
+            Falla fallanueva= repository.save(falla);
+            return mapper.toDto(fallanueva);
             })
-            .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("La falla con ID " + idFalla + " no existe."));
+            .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Dato inválido"));
     
     }
 
