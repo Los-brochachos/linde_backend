@@ -27,9 +27,7 @@ public class DetallePedidoRestController {
     private final DetallePedidoService detallePedidoService;
 
     @PostMapping("/{idPedido}/detalles")
-    public ResponseEntity<DetallePedidoResponse> crear(
-            @PathVariable Integer idPedido,
-            @Valid @RequestBody DetallePedidoRequest request) {
+    public ResponseEntity<DetallePedidoResponse> crear(@PathVariable Integer idPedido, @Valid @RequestBody DetallePedidoRequest request) {
 
         DetallePedidoResponse response =
                 detallePedidoService.crear(idPedido, request);
