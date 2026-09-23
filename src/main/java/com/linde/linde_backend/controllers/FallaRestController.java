@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.linde.linde_backend.services.FallaService;
-import com.linde.linde_backend.entities.cisterna.Falla;
 
+import com.linde.linde_backend.entities.cisterna.Falla;
+import com.linde.linde_backend.services.cisterna.FallaService;
 
 import lombok.RequiredArgsConstructor;
 

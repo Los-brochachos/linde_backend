@@ -1,4 +1,4 @@
-package com.linde.linde_backend.repositories;
+package com.linde.linde_backend.repositories.cisterna;
 
 import java.util.List;
 

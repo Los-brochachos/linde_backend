@@ -1,11 +1,11 @@
-package com.linde.linde_backend.services;
+package com.linde.linde_backend.services.cisterna;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import com.linde.linde_backend.entities.cisterna.Falla;
-import com.linde.linde_backend.repositories.FallaRepository;
-import com.linde.linde_backend.repositories.CisternaRepository;
+import com.linde.linde_backend.repositories.cisterna.CisternaRepository;
+import com.linde.linde_backend.repositories.cisterna.FallaRepository;
 import com.linde.linde_backend.repositories.ConductorRepository;
 import com.linde.linde_backend.entities.cisterna.Cisterna;
 import com.linde.linde_backend.entities.trabajador.Conductor;

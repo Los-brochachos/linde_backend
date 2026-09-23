@@ -1,4 +1,4 @@
-package com.linde.linde_backend.services;
+package com.linde.linde_backend.services.cisterna;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -10,10 +10,11 @@ import com.linde.linde_backend.entities.cisterna.HistorialMantenimiento;
 import com.linde.linde_backend.entities.cisterna.Cisterna;
 import com.linde.linde_backend.entities.cisterna.Falla;
 import com.linde.linde_backend.entities.trabajador.Tecnico;
-import com.linde.linde_backend.repositories.HistorialMantenimientoRepository;
-import com.linde.linde_backend.repositories.CisternaRepository;
-import com.linde.linde_backend.repositories.FallaRepository;
-import com.linde.linde_backend.repositories.TecnicoRepository; 
+import com.linde.linde_backend.repositories.TecnicoRepository;
+import com.linde.linde_backend.repositories.cisterna.CisternaRepository;
+import com.linde.linde_backend.repositories.cisterna.FallaRepository;
+import com.linde.linde_backend.repositories.cisterna.HistorialMantenimientoRepository;
+
 import lombok.RequiredArgsConstructor;
 
 @Service

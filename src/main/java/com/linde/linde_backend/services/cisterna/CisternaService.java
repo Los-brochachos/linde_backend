@@ -1,4 +1,4 @@
-package com.linde.linde_backend.services;
+package com.linde.linde_backend.services.cisterna;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.linde.linde_backend.entities.cisterna.Cisterna;
-import com.linde.linde_backend.repositories.CisternaRepository;
+import com.linde.linde_backend.repositories.cisterna.CisternaRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
