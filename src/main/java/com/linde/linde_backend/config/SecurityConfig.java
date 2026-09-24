@@ -43,16 +43,17 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/**")
                     .permitAll()
 
-                .requestMatchers("/api/v1/trabajador/**")
+                //CRUD DE LOS TRABAJADORES COMPLETO DE LOS TRABAJADORES
+                .requestMatchers("/api/v1/trabajadores/**")
                     .hasRole("ADMIN")
 
-                .requestMatchers("/api/v1/conductor/**")
+                .requestMatchers("/api/v1/conductores/**")
                     .hasRole("ADMIN")
 
-                .requestMatchers("/api/v1/tecnico/**")
+                .requestMatchers("/api/v1/tecnicos/**")
                     .hasRole("ADMIN")
 
-                .requestMatchers("/api/v1/programador/**")
+                .requestMatchers("/api/v1/programadores/**")
                     .hasRole("ADMIN")
 
                 .anyRequest()
