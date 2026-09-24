@@ -18,54 +18,48 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import org.jspecify.annotations.Nullable;
 
 @RestControllerAdvice
+
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-
+ 
+ 
+    // Errores 400
     @Override
-    protected @Nullable ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException ex,
-            HttpHeaders headers,
-            HttpStatusCode status,
-            WebRequest request) {
-
+    protected @Nullable ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+ 
+ 
         Map<String, String> errores = new HashMap<>();
-
         ex.getBindingResult().getAllErrors().forEach(error -> {
-
             String campo = ((FieldError) error).getField();
             String mensaje = error.getDefaultMessage();
-
             errores.put(campo, mensaje);
         });
-
+ 
+ 
         Map<String, Object> response = new HashMap<>();
-
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", "Bad Request - Error de validación");
+        response.put("timestamp", LocalDateTime.now()); // Hora y fecha de incidencia
+        response.put("status", HttpStatus.BAD_REQUEST.value()); // Código de error
+        response.put("error", "Bad Request - Error de validación"); // Mensaje genérico
         response.put("details", errores);
-
-        return new ResponseEntity<>(
-                response,
-                HttpStatus.BAD_REQUEST
-        );
+ 
+ 
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    // MANEJO DE ERRORES INTERNOS - 500
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleException(Exception ex) {
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Object> handleRuntimeException(RuntimeException ex) {
 
         Map<String, Object> response = new HashMap<>();
 
         response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        response.put("error", "Internal Server Error");
-        response.put("message", "Ocurrió un error interno en el servidor");
+        response.put("status", HttpStatus.NOT_FOUND.value());
+        response.put("error", "Not Found");
+        response.put("message", ex.getMessage());
 
         return new ResponseEntity<>(
                 response,
-                HttpStatus.INTERNAL_SERVER_ERROR
+                HttpStatus.NOT_FOUND
         );
     }
-
-    
 }
+ 

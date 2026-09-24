@@ -149,13 +149,13 @@ public class SecurityConfig {
                     .hasAnyRole("ADMIN","ANALISTA","PROGRAMADOR","CONDUCTOR","TECNICO","CLIENTE")
 
                 .requestMatchers(HttpMethod.POST,"/api/v1/pedidos")
-                    .hasRole("CLIENTE")
+                    .hasAnyRole("ADMIN","CLIENTE")
 
                 .requestMatchers(HttpMethod.PATCH,"/api/v1/pedidos/*/estado")
-                    .hasAnyRole("PROGRAMADOR", "CONDUCTOR")
+                    .hasAnyRole("ADMIN","PROGRAMADOR", "CONDUCTOR")
 
                 .requestMatchers(HttpMethod.PATCH,"/api/v1/pedidos/*/cancelar")
-                    .hasRole("CLIENTE")
+                    .hasAnyRole("ADMIN","CLIENTE")
 
                 // PRODUCTOS
 

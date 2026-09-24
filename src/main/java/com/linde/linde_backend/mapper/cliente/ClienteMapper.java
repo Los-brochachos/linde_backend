@@ -5,25 +5,32 @@ import org.springframework.stereotype.Component;
 import com.linde.linde_backend.dto.cliente.ClienteRequest;
 import com.linde.linde_backend.dto.cliente.ClienteResponse;
 import com.linde.linde_backend.entities.cliente.Cliente;
+import com.linde.linde_backend.entities.usuario.Usuario;
 
-@Component 
+@Component
 public class ClienteMapper {
-    public Cliente toEntity (ClienteRequest dto){
+
+    public Cliente toEntity(ClienteRequest dto, Usuario usuario) {
+
         return Cliente.builder()
-        .ruc(dto.ruc())
-        .razonSocial(dto.rsocial())
-        .direccion(dto.direccion())
-        .telefono(dto.telefono())
-        .correo(dto.correo())
-        .build();
+                .usuario(usuario)
+                .ruc(dto.ruc())
+                .razonSocial(dto.rsocial())
+                .direccion(dto.direccion())
+                .telefono(dto.telefono())
+                .correo(dto.correo())
+                .build();
     }
-    public ClienteResponse toDto(Cliente entitty){
+
+    public ClienteResponse toDto(Cliente entity) {
+
         return new ClienteResponse(
-            entitty.getIdCliente(),
-            entitty.getRuc(),
-            entitty.getRazonSocial(),
-            entitty.getDireccion(),
-            entitty.getTelefono(),
-            entitty.getCorreo());
+                entity.getIdCliente(),
+                entity.getRuc(),
+                entity.getRazonSocial(),
+                entity.getDireccion(),
+                entity.getTelefono(),
+                entity.getCorreo()
+        );
     }
 }

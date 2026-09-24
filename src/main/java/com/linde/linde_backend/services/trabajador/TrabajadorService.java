@@ -36,7 +36,7 @@ public class TrabajadorService {
     public TrabajadorResponse buscarPorId(Integer id) {
 
         Trabajador trabajador = trabajadorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(()-> new RuntimeException(
                         "Trabajador no encontrado"
                 ));
 
