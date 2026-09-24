@@ -19,7 +19,7 @@ import com.linde.linde_backend.services.pedido.DetallePedidoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-@RestController
+@RestController 
 @RequestMapping("/api/v1/pedidos")
 @RequiredArgsConstructor
 public class DetallePedidoRestController {
