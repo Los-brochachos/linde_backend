@@ -1,4 +1,4 @@
-package com.linde.linde_backend.repositories;
+package com.linde.linde_backend.repositories.cisterna;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,4 +23,8 @@ public interface HistorialMantenimientoRepository extends JpaRepository<Historia
      */
     @EntityGraph(attributePaths = {"cisterna", "tecnico"})
     List<HistorialMantenimiento> findByFechaBetween(LocalDateTime inicio, LocalDateTime fin);
+
+    @EntityGraph(attributePaths = {"cisterna", "tecnico"})
+    List<HistorialMantenimiento> findByCisterna_Nombre(String nombre);
+
 }
