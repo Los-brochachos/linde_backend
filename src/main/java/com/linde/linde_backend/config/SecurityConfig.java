@@ -40,23 +40,13 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth
 
-                .requestMatchers("/api/v1/auth/**")
-                    .permitAll()
+                .requestMatchers("/auth/**").permitAll()
 
-                .requestMatchers("/api/v1/trabajador/**")
-                    .hasRole("ADMIN")
-
-                .requestMatchers("/api/v1/conductor/**")
-                    .hasRole("ADMIN")
-
-                .requestMatchers("/api/v1/tecnico/**")
-                    .hasRole("ADMIN")
-
-                .requestMatchers("/api/v1/programador/**")
-                    .hasRole("ADMIN")
-
-                .anyRequest()
-                    .authenticated()
+                .requestMatchers("/api/v1/trabajador/**").hasRole("ADMIN")
+                .requestMatchers("/api/v1/conductor/**").hasRole("ADMIN")
+                .requestMatchers("/api/v1/tecnico/**").hasRole("ADMIN")
+                .requestMatchers("/api/v1/programador/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
             )
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);

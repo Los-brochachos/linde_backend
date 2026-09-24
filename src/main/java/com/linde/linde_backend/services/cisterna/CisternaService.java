@@ -3,6 +3,7 @@ package com.linde.linde_backend.services.cisterna;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.linde.linde_backend.dto.cisterna.CisternaRequest;
@@ -53,7 +54,8 @@ public class CisternaService {
                 Cisterna cisternaGuardada = repository.save(cisterna);
                 return mapper.toDto(cisternaGuardada);
             })
-            .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("La cisterna '" + request.nombre() + "' no existe."));
+            .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+            HttpStatus.NOT_FOUND, "La cisterna '" + request.nombre() + "' no existe."));
     }
 
     @Transactional 
@@ -67,8 +69,8 @@ public CisternaResponse editar(EditarCisternaRequest request) {
             Cisterna cisternaGuardada = repository.save(cisterna);
             return mapper.toDto(cisternaGuardada);
         })
-        .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException(
-            "La cisterna '" + request.nombreBuscar() + "' no existe."
+        .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+            HttpStatus.NOT_FOUND, "La cisterna '" + request.nombreBuscar() + "' no existe."
         ));
 }
 }
