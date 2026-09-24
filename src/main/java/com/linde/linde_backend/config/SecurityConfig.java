@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -42,18 +43,219 @@ public class SecurityConfig {
 
                 .requestMatchers("/auth/**").permitAll()
 
-                //CRUD DE LOS TRABAJADORES COMPLETO DE LOS TRABAJADORES
-                .requestMatchers("/api/v1/trabajadores/**")
+
+                //USUARIOS  
+                .requestMatchers(HttpMethod.GET, "/api/v1/usuarios/me")
+                    .authenticated()
+
+                .requestMatchers(HttpMethod.GET, "/api/v1/usuarios")
+                    .hasAnyRole("ADMIN", "ANALISTA")
+
+                .requestMatchers(HttpMethod.GET, "/api/v1/usuarios/*")
+                    .hasAnyRole("ADMIN", "ANALISTA")
+
+                .requestMatchers(HttpMethod.PUT, "/api/v1/usuarios/*")
+                    .hasAnyRole("ADMIN", "CLIENTE", "PROGRAMADOR", "CONDUCTOR", "TECNICO")
+
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/usuarios/*")
                     .hasRole("ADMIN")
 
-                .requestMatchers("/api/v1/conductores/**")
+                // TRABAJADORES
+                .requestMatchers(HttpMethod.GET, "/api/v1/trabajadores")
+                    .hasAnyRole("ADMIN", "ANALISTA")
+
+                .requestMatchers(HttpMethod.GET, "/api/v1/trabajadores/*")
+                    .hasAnyRole("ADMIN", "ANALISTA")
+
+                .requestMatchers(HttpMethod.POST, "/api/v1/trabajadores")
                     .hasRole("ADMIN")
 
-                .requestMatchers("/api/v1/tecnicos/**")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/trabajadores/*")
                     .hasRole("ADMIN")
 
-                .requestMatchers("/api/v1/programadores/**")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/trabajadores/*")
                     .hasRole("ADMIN")
+
+
+
+                // TÉCNICOS
+
+                .requestMatchers(HttpMethod.GET, "/api/v1/tecnicos")
+                    .hasAnyRole("ADMIN", "ANALISTA")
+
+                .requestMatchers(HttpMethod.GET, "/api/v1/tecnicos/*")
+                    .hasAnyRole("ADMIN", "ANALISTA", "TECNICO")
+
+                .requestMatchers(HttpMethod.POST, "/api/v1/tecnicos/*")
+                    .hasRole("ADMIN")
+
+                .requestMatchers(HttpMethod.PUT, "/api/v1/tecnicos/*")
+                    .hasRole("ADMIN")
+
+
+                // PROGRAMADORES
+
+                .requestMatchers(HttpMethod.GET, "/api/v1/programadores")
+                    .hasAnyRole("ADMIN", "ANALISTA")
+
+                .requestMatchers(HttpMethod.GET, "/api/v1/programadores/*")
+                    .hasAnyRole("ADMIN", "ANALISTA", "PROGRAMADOR")
+
+                .requestMatchers(HttpMethod.POST, "/api/v1/programadores/*")
+                    .hasRole("ADMIN")
+
+                .requestMatchers(HttpMethod.PUT, "/api/v1/programadores/*")
+                    .hasRole("ADMIN")
+
+
+                // CONDUCTORES
+
+                .requestMatchers(HttpMethod.GET, "/api/v1/conductores")
+                    .hasAnyRole("ADMIN", "ANALISTA")
+
+                .requestMatchers(HttpMethod.GET, "/api/v1/conductores/*")
+                    .hasAnyRole("ADMIN", "ANALISTA", "CONDUCTOR")
+
+                .requestMatchers(HttpMethod.POST, "/api/v1/conductores/*")
+                    .hasRole("ADMIN")
+
+                .requestMatchers(HttpMethod.PUT, "/api/v1/conductores/*")
+                    .hasRole("ADMIN")
+
+
+
+                // DETALLES DE PEDIDO
+
+                .requestMatchers(HttpMethod.POST, "/api/v1/pedidos/*/detalles")
+                    .hasRole("CLIENTE")
+
+                .requestMatchers(HttpMethod.GET,"/api/v1/pedidos/*/detalles")
+                    .hasAnyRole("ADMIN", "ANALISTA", "CLIENTE")
+
+                .requestMatchers(HttpMethod.PUT,"/api/v1/pedidos/*/detalles/*")
+                    .hasRole("CLIENTE")
+
+                
+
+                // PEDIDOS
+
+                .requestMatchers(HttpMethod.GET,"/api/v1/pedidos")
+                    .hasAnyRole("ADMIN","ANALISTA","PROGRAMADOR","CONDUCTOR","TECNICO","CLIENTE")
+
+                .requestMatchers(HttpMethod.GET,"/api/v1/pedidos/*")
+                    .hasAnyRole("ADMIN","ANALISTA","PROGRAMADOR","CONDUCTOR","TECNICO","CLIENTE")
+
+                .requestMatchers(HttpMethod.GET,"/api/v1/pedidos/*/seguimiento")
+                    .hasAnyRole("ADMIN","ANALISTA","PROGRAMADOR","CONDUCTOR","TECNICO","CLIENTE")
+
+                .requestMatchers(HttpMethod.POST,"/api/v1/pedidos")
+                    .hasRole("CLIENTE")
+
+                .requestMatchers(HttpMethod.PATCH,"/api/v1/pedidos/*/estado")
+                    .hasAnyRole("PROGRAMADOR", "CONDUCTOR")
+
+                .requestMatchers(HttpMethod.PATCH,"/api/v1/pedidos/*/cancelar")
+                    .hasRole("CLIENTE")
+
+                // PRODUCTOS
+
+                .requestMatchers(HttpMethod.GET,"/api/v1/productos")
+                    .hasAnyRole("ADMIN","ANALISTA","PROGRAMADOR","CONDUCTOR","TECNICO","CLIENTE")
+
+                .requestMatchers(HttpMethod.GET, "/api/v1/productos/*")
+                    .hasAnyRole("ADMIN","ANALISTA","PROGRAMADOR","CONDUCTOR","TECNICO","CLIENTE")
+
+                .requestMatchers(HttpMethod.POST,"/api/v1/productos")
+                    .hasRole("ADMIN")
+
+                .requestMatchers(HttpMethod.PUT,"/api/v1/productos/*")
+                    .hasRole("ADMIN")
+
+                .requestMatchers(HttpMethod.DELETE,"/api/v1/productos/*")
+                    .hasRole("ADMIN")
+                
+                
+                // CLIENTES
+
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/api/v1/cliente"
+                )
+                    .hasAnyRole("ADMIN", "ANALISTA")
+
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/api/v1/cliente/*"
+                )
+                    .hasAnyRole("ADMIN", "ANALISTA", "CLIENTE")
+
+                .requestMatchers(
+                    HttpMethod.POST,
+                    "/api/v1/cliente"
+                )
+                    .hasRole("ADMIN")
+
+                .requestMatchers(
+                    HttpMethod.DELETE,
+                    "/api/v1/cliente/*"
+                )
+                    .hasRole("ADMIN")
+
+
+                // CISTERNAS
+
+                .requestMatchers(HttpMethod.GET,"/api/v1/cisternas")
+                    .hasAnyRole("ADMIN","ANALISTA","PROGRAMADOR","CONDUCTOR","TECNICO")
+
+                .requestMatchers(HttpMethod.GET,"/api/v1/cisternas/placa/*")
+                    .hasAnyRole("ADMIN","ANALISTA","PROGRAMADOR","CONDUCTOR","TECNICO")
+
+                .requestMatchers(HttpMethod.GET,"/api/v1/cisternas/nombre/*")
+                    .hasAnyRole("ADMIN","ANALISTA","PROGRAMADOR","CONDUCTOR","TECNICO")
+
+                .requestMatchers(HttpMethod.POST,"/api/v1/cisternas")
+                    .hasRole("ADMIN")
+
+                .requestMatchers(HttpMethod.PUT,"/api/v1/cisternas")   
+                    .hasRole("ADMIN")
+
+                .requestMatchers(HttpMethod.DELETE,"/api/v1/cisternas")
+                    .hasRole("ADMIN")
+                
+
+
+
+                // FALLAS
+
+                .requestMatchers(HttpMethod.GET,"/api/v1/falla")
+                    .hasAnyRole("ADMIN","ANALISTA","PROGRAMADOR","CONDUCTOR","TECNICO")
+
+                .requestMatchers(HttpMethod.GET,"/api/v1/falla/idCisterna/*")
+                    .hasAnyRole("ADMIN","ANALISTA","PROGRAMADOR","CONDUCTOR","TECNICO")
+
+                .requestMatchers(HttpMethod.POST,"/api/v1/falla")
+                    .hasAnyRole("ADMIN", "TECNICO")
+
+                .requestMatchers(HttpMethod.PUT,"/api/v1/falla/solucionar")
+                    .hasAnyRole("ADMIN", "TECNICO")
+
+
+                // HISTORIAL DE MANTENIMIENTO
+
+                .requestMatchers(HttpMethod.GET,"/api/v1/historial")
+                    .hasAnyRole("ADMIN","ANALISTA","PROGRAMADOR","CONDUCTOR","TECNICO")
+
+                .requestMatchers(HttpMethod.GET,"/api/v1/historial/cisterna/*")
+                    .hasAnyRole("ADMIN","ANALISTA","PROGRAMADOR","CONDUCTOR","TECNICO")
+
+                .requestMatchers(HttpMethod.GET,"/api/v1/historial/nombre/*")
+                    .hasAnyRole("ADMIN","ANALISTA","PROGRAMADOR","CONDUCTOR","TECNICO")
+
+                .requestMatchers(HttpMethod.GET,"/api/v1/historial/fecha/*")
+                    .hasAnyRole("ADMIN","ANALISTA","PROGRAMADOR","CONDUCTOR","TECNICO")
+
+                .requestMatchers(HttpMethod.POST,"/api/v1/historial")
+                    .hasAnyRole("ADMIN", "TECNICO")
 
                 .anyRequest()
                     .authenticated()
