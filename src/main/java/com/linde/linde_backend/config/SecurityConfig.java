@@ -40,8 +40,7 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth
 
-                .requestMatchers("/api/v1/auth/**")
-                    .permitAll()
+                .requestMatchers("/auth/**").permitAll()
 
                 //CRUD DE LOS TRABAJADORES COMPLETO DE LOS TRABAJADORES
                 .requestMatchers("/api/v1/trabajadores/**")
