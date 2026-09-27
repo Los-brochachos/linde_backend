@@ -31,7 +31,7 @@ public class Conductor {
     @JoinColumn (name="idTrabajador")
     private Trabajador trabajador; 
 
-    @Column (nullable = false, length = 30)
+    @Column(nullable = false, length = 30, unique = true)
     private String licenciaConducir;
     @Column (nullable = false, length = 30)
     private String categoriaLicencia;

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,64 +13,95 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.linde.linde_backend.dto.cliente.ClienteRequest;
+import com.linde.linde_backend.dto.cliente.ClienteCreateRequest;
 import com.linde.linde_backend.dto.cliente.ClienteResponse;
-import com.linde.linde_backend.entities.cliente.Cliente;
+import com.linde.linde_backend.dto.cliente.ClienteUpdateRequest;
 import com.linde.linde_backend.services.cliente.ClienteService;
+import com.linde.linde_backend.utils.RegisterResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+
+
 @RestController
 @RequestMapping("/api/v1/clientes")
 @RequiredArgsConstructor
-@Validated
 public class ClienteRestController {
 
     private final ClienteService clienteS;
-
+    
+    // Listar todos los clientes
     @GetMapping
-    public ResponseEntity<List<Cliente>> listar() {
-        return ResponseEntity.ok(clienteS.listarClientes());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Cliente> buscarCliente(
-            @PathVariable Integer id) {
+    public ResponseEntity<List<ClienteResponse>> listar() {
 
         return ResponseEntity.ok(
-                clienteS.buscarCliente(id)
+                clienteS.listarClientesTodos()
         );
     }
 
-    @PostMapping
-    public ResponseEntity<ClienteResponse> crearCliente(
-            @Valid @RequestBody ClienteRequest request) {
+    // Listar solo clientes activos
+    @GetMapping("/activos")
+    public ResponseEntity<List<ClienteResponse>> listarActivos() {
+        return ResponseEntity.ok(
+            clienteS.listarActivos()
+        );
+    }
+    
+    // Buscar cliente por ID, sin importar su estado
+    @GetMapping("/{id}")
+    public ResponseEntity<ClienteResponse> buscarCliente(
+            @PathVariable Integer id) {
 
-        ClienteResponse cliente = clienteS.crearCliente(request);
+        return ResponseEntity.ok(
+                clienteS.buscarPorId(id)
+        );
+    }
+
+
+    @GetMapping("/{id}/activo")
+    public ResponseEntity<ClienteResponse> buscarActivoPorId(@PathVariable Integer id) {
+        return ResponseEntity.ok(
+            clienteS.buscarActivoPorId(id)
+        );
+    }
+    
+
+
+
+    
+
+    @PostMapping("/register")
+    public ResponseEntity<RegisterResponse> crearCliente(
+            @Valid @RequestBody ClienteCreateRequest request) {
+
+        RegisterResponse cliente =
+                clienteS.crearCliente(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(cliente);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminaCliente(
-            @PathVariable Integer id) {
-
-        clienteS.eliminarCliente(id);
-
-        return ResponseEntity.noContent().build();
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<ClienteResponse> actualizarCliente(
             @PathVariable Integer id,
-            @Valid @RequestBody ClienteRequest request) {
+            @Valid @RequestBody ClienteUpdateRequest request) {
 
-        ClienteResponse cliente = clienteS.actualizarCliente(id, request);
+        ClienteResponse cliente =
+                clienteS.actualizarCliente(id, request);
 
         return ResponseEntity.ok(cliente);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarCliente(
+            @PathVariable Integer id) {
+
+        clienteS.eliminarCliente(id);
+
+        return ResponseEntity
+                .noContent()
+                .build();
+    }
 }

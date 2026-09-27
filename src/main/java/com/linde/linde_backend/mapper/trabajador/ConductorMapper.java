@@ -2,8 +2,8 @@ package com.linde.linde_backend.mapper.trabajador;
 
 import org.springframework.stereotype.Component;
 
-import com.linde.linde_backend.dto.trabajador.ConductorRequest;
-import com.linde.linde_backend.dto.trabajador.ConductorResponse;
+import com.linde.linde_backend.dto.trabajador.conductor.ConductorCreateRequest;
+import com.linde.linde_backend.dto.trabajador.conductor.ConductorResponse;
 import com.linde.linde_backend.entities.trabajador.Conductor;
 import com.linde.linde_backend.entities.trabajador.Trabajador;
 
@@ -11,7 +11,7 @@ import com.linde.linde_backend.entities.trabajador.Trabajador;
 public class ConductorMapper {
 
     public Conductor toEntity(
-            ConductorRequest request,
+            ConductorCreateRequest request,
             Trabajador trabajador) {
 
         return Conductor.builder()
@@ -34,9 +34,18 @@ public class ConductorMapper {
                 trabajador.getNombres(),
                 trabajador.getApellidos(),
                 trabajador.getDni(),
+                trabajador.getTelefono(),
+                trabajador.getDireccion(),
+                trabajador.getFechaIngreso(),
+                trabajador.getEstado(),
+                trabajador.getUsuario().getCorreo(),
+                trabajador.getUsuario().getRol(),
                 conductor.getLicenciaConducir(),
                 conductor.getCategoriaLicencia(),
-                conductor.getFechaVencimientoLicencia()
+                conductor.getFechaVencimientoLicencia(),
+                trabajador.getFechaCreacion(),
+                trabajador.getFechaActualizacion()
         );
     }
 }
+

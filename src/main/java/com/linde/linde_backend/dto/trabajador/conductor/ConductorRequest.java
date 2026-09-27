@@ -1,4 +1,4 @@
-package com.linde.linde_backend.dto.trabajador;
+package com.linde.linde_backend.dto.trabajador.conductor;
 
 import java.time.LocalDate;
 

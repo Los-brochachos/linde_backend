@@ -13,8 +13,6 @@ import com.linde.linde_backend.services.AuthService;
 import com.linde.linde_backend.utils.AuthRequest;
 import com.linde.linde_backend.utils.AuthResponse;
 import com.linde.linde_backend.utils.RefreshTokenRequest;
-import com.linde.linde_backend.utils.RegisterRequest;
-import com.linde.linde_backend.utils.RegisterResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,14 +24,7 @@ public class AuthRestController {
 
     private final AuthService authService;
 
-    @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(
-            @Valid @RequestBody RegisterRequest request) {
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(authService.register(request));
-    }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> authenticate(
