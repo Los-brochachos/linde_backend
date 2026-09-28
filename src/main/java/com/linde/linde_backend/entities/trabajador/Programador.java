@@ -1,7 +1,12 @@
 package com.linde.linde_backend.entities.trabajador;
 
+import com.linde.linde_backend.utils.trabajador.NivelIngles;
+import com.linde.linde_backend.utils.trabajador.Turno;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -24,14 +29,16 @@ import lombok.Setter;
 public class Programador {
     @Id
     private Integer idTrabajador;
-
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "idTrabajador")
     private Trabajador trabajador;
 
-    @Column (nullable = false, length = 100)
-    private String area;
-    @Column (nullable = false, length = 30)
-    private String turno;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private NivelIngles nivelIngles;
+
+    @Enumerated (EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private Turno turno;
 }

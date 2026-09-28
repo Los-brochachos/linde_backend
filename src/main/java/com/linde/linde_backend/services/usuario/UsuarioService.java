@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.linde.linde_backend.dto.usuario.UsuarioResponse;
 import com.linde.linde_backend.dto.usuario.UsuarioUpdateRequest;
 import com.linde.linde_backend.entities.usuario.Usuario;
-import com.linde.linde_backend.mapper.usuario.UsuarioMapper;
+import com.linde.linde_backend.mappers.usuario.UsuarioMapper;
 import com.linde.linde_backend.repositories.usuario.UsuarioRepository;
 import com.linde.linde_backend.utils.Estado;
 

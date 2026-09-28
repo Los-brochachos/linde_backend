@@ -11,13 +11,12 @@ import com.linde.linde_backend.dto.cliente.ClienteResponse;
 import com.linde.linde_backend.dto.cliente.ClienteUpdateRequest;
 import com.linde.linde_backend.entities.cliente.Cliente;
 import com.linde.linde_backend.entities.usuario.Usuario;
-import com.linde.linde_backend.mapper.cliente.ClienteMapper;
+import com.linde.linde_backend.mappers.cliente.ClienteMapper;
 import com.linde.linde_backend.repositories.cliente.ClienteRepository;
 import com.linde.linde_backend.repositories.usuario.UsuarioRepository;
 import com.linde.linde_backend.utils.Estado;
-import com.linde.linde_backend.utils.RegisterResponse;
 import com.linde.linde_backend.utils.RolesEnum;
-
+import com.linde.linde_backend.utils.auth.RegisterResponse;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +56,7 @@ public class ClienteService {
     public ClienteResponse buscarActivoPorId(Integer id) {
 
         Cliente cliente = clienteRepository
-                .findByIdAndUsuarioEstado(
+                .findByIdClienteAndUsuarioEstado(
                         id,
                         Estado.ACTIVO
                 ).orElseThrow(() ->new NoSuchElementException("Cliente no encontrado"));

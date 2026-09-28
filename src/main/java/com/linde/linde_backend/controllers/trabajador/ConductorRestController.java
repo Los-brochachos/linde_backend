@@ -28,11 +28,6 @@ public class ConductorRestController {
 
     private final ConductorService conductorService;
 
-
-    // =========================
-    // LISTAR TODOS
-    // =========================
-
     @GetMapping
     public ResponseEntity<List<ConductorResponse>> listarTodos() {
 
@@ -42,9 +37,6 @@ public class ConductorRestController {
     }
 
 
-    // =========================
-    // LISTAR ACTIVOS
-    // =========================
 
     @GetMapping("/activos")
     public ResponseEntity<List<ConductorResponse>> listarActivos() {
@@ -54,10 +46,6 @@ public class ConductorRestController {
         );
     }
 
-
-    // =========================
-    // BUSCAR POR ID
-    // =========================
 
     @GetMapping("/{id}")
     public ResponseEntity<ConductorResponse> buscarPorId(
@@ -69,10 +57,6 @@ public class ConductorRestController {
     }
 
 
-    // =========================
-    // BUSCAR ACTIVO POR ID
-    // =========================
-
     @GetMapping("/{id}/activo")
     public ResponseEntity<ConductorResponse> buscarActivoPorId(
             @PathVariable Integer id) {
@@ -82,10 +66,6 @@ public class ConductorRestController {
         );
     }
 
-
-    // =========================
-    // CREAR
-    // =========================
 
     @PostMapping
     public ResponseEntity<ConductorResponse> crear(
@@ -98,11 +78,6 @@ public class ConductorRestController {
                 .status(HttpStatus.CREATED)
                 .body(response);
     }
-
-
-    // =========================
-    // ACTUALIZAR
-    // =========================
 
     @PutMapping("/{id}")
     public ResponseEntity<ConductorResponse> actualizar(

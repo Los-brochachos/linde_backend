@@ -2,8 +2,11 @@ package com.linde.linde_backend.dto.trabajador.conductor;
 
 import java.time.LocalDate;
 
+import com.linde.linde_backend.utils.trabajador.CategoriaLicencia;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -57,11 +60,8 @@ public record ConductorUpdateRequest(
     )
     String licenciaConducir,
 
-    @Size(
-        max = 30,
-        message = "La categoría de licencia no puede superar los 30 caracteres"
-    )
-    String categoriaLicencia,
+    @NotNull (message = "La categoría de licencia es obligatoria")
+    CategoriaLicencia categoriaLicencia,
 
     @Future(
         message = "La fecha de vencimiento debe ser posterior a la fecha actual"

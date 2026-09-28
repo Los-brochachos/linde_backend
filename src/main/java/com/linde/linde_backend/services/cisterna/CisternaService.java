@@ -11,7 +11,7 @@ import com.linde.linde_backend.dto.cisterna.CisternaResponse;
 import com.linde.linde_backend.dto.cisterna.EditarCisternaRequest;
 import com.linde.linde_backend.dto.cisterna.EliminarCisternaRequest;
 import com.linde.linde_backend.entities.cisterna.Cisterna;
-import com.linde.linde_backend.mapper.cisterna.CisternaMapper;
+import com.linde.linde_backend.mappers.cisterna.CisternaMapper;
 import com.linde.linde_backend.repositories.cisterna.CisternaRepository;
 
 import jakarta.transaction.Transactional;

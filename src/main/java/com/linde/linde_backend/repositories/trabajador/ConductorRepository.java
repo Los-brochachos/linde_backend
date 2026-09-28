@@ -12,7 +12,7 @@ public interface ConductorRepository extends JpaRepository<Conductor, Integer> {
 
     List<Conductor> findByTrabajadorEstado(Estado estado);
 
-    Optional<Conductor> findByIdAndTrabajadorEstado(
+    Optional<Conductor> findByIdTrabajadorAndTrabajadorEstado(
             Integer idTrabajador,
             Estado estado
     );

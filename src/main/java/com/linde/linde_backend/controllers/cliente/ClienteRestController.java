@@ -17,7 +17,7 @@ import com.linde.linde_backend.dto.cliente.ClienteCreateRequest;
 import com.linde.linde_backend.dto.cliente.ClienteResponse;
 import com.linde.linde_backend.dto.cliente.ClienteUpdateRequest;
 import com.linde.linde_backend.services.cliente.ClienteService;
-import com.linde.linde_backend.utils.RegisterResponse;
+import com.linde.linde_backend.utils.auth.RegisterResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

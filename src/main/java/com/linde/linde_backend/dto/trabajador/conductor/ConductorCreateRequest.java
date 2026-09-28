@@ -2,6 +2,8 @@ package com.linde.linde_backend.dto.trabajador.conductor;
 
 import java.time.LocalDate;
 
+import com.linde.linde_backend.utils.trabajador.CategoriaLicencia;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
@@ -54,12 +56,8 @@ public record ConductorCreateRequest(
     )
     String licenciaConducir,
 
-    @NotBlank(message = "La categoría de licencia es obligatoria")
-    @Size(
-        max = 30,
-        message = "La categoría de licencia no puede superar los 30 caracteres"
-    )
-    String categoriaLicencia,
+    @NotNull(message = "La categoría de licencia es obligatoria")
+    CategoriaLicencia categoriaLicencia,
 
     @NotNull(message = "La fecha de vencimiento de la licencia es obligatoria")
     @Future(message = "La fecha de vencimiento debe ser posterior a la fecha actual")

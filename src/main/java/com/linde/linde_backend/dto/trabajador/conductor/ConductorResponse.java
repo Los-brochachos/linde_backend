@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import com.linde.linde_backend.utils.Estado;
 import com.linde.linde_backend.utils.RolesEnum;
+import com.linde.linde_backend.utils.trabajador.CategoriaLicencia;
 
 public record ConductorResponse(
 
@@ -25,7 +26,7 @@ public record ConductorResponse(
 
     // Datos del conductor
     String licenciaConducir,
-    String categoriaLicencia,
+    CategoriaLicencia categoriaLicencia,
     LocalDate fechaVencimientoLicencia,
 
     // Auditoría

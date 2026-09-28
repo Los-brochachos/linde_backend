@@ -11,7 +11,7 @@ import com.linde.linde_backend.dto.cisterna.FallaRequest;
 import com.linde.linde_backend.dto.cisterna.FallaResponse;
 import com.linde.linde_backend.entities.cisterna.Cisterna;
 import com.linde.linde_backend.entities.trabajador.Conductor;
-import com.linde.linde_backend.mapper.cisterna.FallaMapper;
+import com.linde.linde_backend.mappers.cisterna.FallaMapper;
 
 import jakarta.transaction.Transactional;
 

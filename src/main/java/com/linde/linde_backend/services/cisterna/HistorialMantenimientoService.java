@@ -11,7 +11,7 @@ import com.linde.linde_backend.dto.cisterna.HistorialMantenimientoResponse;
 import com.linde.linde_backend.entities.cisterna.Cisterna;
 import com.linde.linde_backend.entities.cisterna.Falla;
 import com.linde.linde_backend.entities.trabajador.Tecnico;
-import com.linde.linde_backend.mapper.cisterna.HistorialMantenimientoMapper;
+import com.linde.linde_backend.mappers.cisterna.HistorialMantenimientoMapper;
 import com.linde.linde_backend.repositories.cisterna.HistorialMantenimientoRepository;
 import com.linde.linde_backend.repositories.cisterna.CisternaRepository;
 import com.linde.linde_backend.repositories.cisterna.FallaRepository;

@@ -1,0 +1,28 @@
+package com.linde.linde_backend.dto.pedido.pedido;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import com.linde.linde_backend.dto.pedido.detallepedido.DetallePedidoRequest;
+import com.linde.linde_backend.utils.pedido.PrioridadPedido;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
+public record PedidoRequest(
+
+    @NotNull(message = "La fecha de entrega estimada es obligatoria")
+    LocalDate fechaEntregaEstimada,
+
+    @NotNull(message = "La prioridad es obligatoria")
+    PrioridadPedido prioridad,
+
+    @NotNull(message = "El cliente es obligatorio")
+    Integer idCliente,
+
+    @NotEmpty(message = "El pedido debe contener al menos un producto")
+    @Valid
+    List<DetallePedidoRequest> detalles
+
+) {}

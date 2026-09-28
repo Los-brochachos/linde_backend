@@ -2,8 +2,12 @@ package com.linde.linde_backend.entities.trabajador;
 
 import java.time.LocalDate;
 
+import com.linde.linde_backend.utils.trabajador.CategoriaLicencia;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -33,8 +37,10 @@ public class Conductor {
 
     @Column(nullable = false, length = 30, unique = true)
     private String licenciaConducir;
-    @Column (nullable = false, length = 30)
-    private String categoriaLicencia;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private CategoriaLicencia categoriaLicencia;
     @Column (nullable = false)
     private LocalDate fechaVencimientoLicencia;
 }

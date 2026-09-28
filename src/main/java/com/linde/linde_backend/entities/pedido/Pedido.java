@@ -1,10 +1,11 @@
 package com.linde.linde_backend.entities.pedido;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import com.linde.linde_backend.entities.cliente.Cliente;
-import com.linde.linde_backend.utils.EstadoPedido;
-import com.linde.linde_backend.utils.PrioridadPedido;
+import com.linde.linde_backend.utils.pedido.EstadoPedido;
+import com.linde.linde_backend.utils.pedido.PrioridadPedido;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,6 +17,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -54,4 +56,10 @@ public class Pedido {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idCliente", nullable = false)
     private Cliente cliente;
+
+        @OneToMany(
+        mappedBy = "pedido",
+        fetch = FetchType.LAZY
+    )
+    private List<DetallePedido> detalles;
 }

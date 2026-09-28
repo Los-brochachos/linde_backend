@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.linde.linde_backend.dto.pedido.CambioEstadoPedidoRequest;
-import com.linde.linde_backend.dto.pedido.PedidoRequest;
-import com.linde.linde_backend.dto.pedido.PedidoResponse;
-import com.linde.linde_backend.dto.pedido.SeguimientoPedidoResponse;
+import com.linde.linde_backend.dto.pedido.seguimientopedido.CancelarPedidoRequest;
+import com.linde.linde_backend.dto.pedido.pedido.PedidoRequest;
+import com.linde.linde_backend.dto.pedido.pedido.PedidoResponse;
+import com.linde.linde_backend.dto.pedido.seguimientopedido.CambioEstadoPedidoRequest;
 import com.linde.linde_backend.services.pedido.PedidoService;
 
 import jakarta.validation.Valid;
@@ -42,15 +42,6 @@ public class PedidoRestController {
         return ResponseEntity.ok(service.buscarPorId(id));
     }
 
-    @GetMapping("/{id}/seguimiento")
-    public ResponseEntity<List<SeguimientoPedidoResponse>> listarSeguimiento(
-            @PathVariable Integer id) {
-
-        return ResponseEntity.ok(
-                service.listarSeguimiento(id)
-        );
-    }
-
     @PostMapping
     public ResponseEntity<PedidoResponse> insertar(
             @Valid @RequestBody PedidoRequest request) {
@@ -72,10 +63,11 @@ public class PedidoRestController {
 
     @PatchMapping("/{id}/cancelar")
     public ResponseEntity<PedidoResponse> cancelar(
-            @PathVariable Integer id) {
+            @PathVariable Integer id,
+            @Valid @RequestBody CancelarPedidoRequest request) {
 
         return ResponseEntity.ok(
-                service.cancelar(id)
+                service.cancelar(id, request)
         );
     }
 }

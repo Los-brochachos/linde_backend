@@ -13,7 +13,7 @@ import com.linde.linde_backend.dto.trabajador.conductor.ConductorUpdateRequest;
 import com.linde.linde_backend.entities.trabajador.Conductor;
 import com.linde.linde_backend.entities.trabajador.Trabajador;
 import com.linde.linde_backend.entities.usuario.Usuario;
-import com.linde.linde_backend.mapper.trabajador.ConductorMapper;
+import com.linde.linde_backend.mappers.trabajador.ConductorMapper;
 import com.linde.linde_backend.repositories.trabajador.ConductorRepository;
 import com.linde.linde_backend.repositories.trabajador.TrabajadorRepository;
 import com.linde.linde_backend.repositories.usuario.UsuarioRepository;
@@ -84,7 +84,7 @@ public class ConductorService {
     public ConductorResponse buscarActivoPorId(Integer id) {
 
         Conductor conductor = conductorRepository
-                .findByIdAndTrabajadorEstado(
+                .findByIdTrabajadorAndTrabajadorEstado(
                         id,
                         Estado.ACTIVO
                 )

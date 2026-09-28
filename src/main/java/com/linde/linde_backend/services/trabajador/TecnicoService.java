@@ -1,17 +1,23 @@
 package com.linde.linde_backend.services.trabajador;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.linde.linde_backend.dto.trabajador.TecnicoRequest;
-import com.linde.linde_backend.dto.trabajador.TecnicoResponse;
+import com.linde.linde_backend.dto.trabajador.tecnico.TecnicoCreateRequest;
+import com.linde.linde_backend.dto.trabajador.tecnico.TecnicoResponse;
+import com.linde.linde_backend.dto.trabajador.tecnico.TecnicoUpdateRequest;
 import com.linde.linde_backend.entities.trabajador.Tecnico;
 import com.linde.linde_backend.entities.trabajador.Trabajador;
-import com.linde.linde_backend.mapper.trabajador.TecnicoMapper;
+import com.linde.linde_backend.entities.usuario.Usuario;
+import com.linde.linde_backend.mappers.trabajador.TecnicoMapper;
 import com.linde.linde_backend.repositories.trabajador.TecnicoRepository;
 import com.linde.linde_backend.repositories.trabajador.TrabajadorRepository;
+import com.linde.linde_backend.repositories.usuario.UsuarioRepository;
+import com.linde.linde_backend.utils.Estado;
 import com.linde.linde_backend.utils.RolesEnum;
 
 import lombok.RequiredArgsConstructor;
@@ -22,45 +28,97 @@ public class TecnicoService {
 
     private final TecnicoRepository tecnicoRepository;
     private final TrabajadorRepository trabajadorRepository;
+    private final UsuarioRepository usuarioRepository;
     private final TecnicoMapper tecnicoMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public List<TecnicoResponse> listar() {
-
+    public List<TecnicoResponse> listarTodos() {
         return tecnicoRepository.findAll()
                 .stream()
                 .map(tecnicoMapper::toResponse)
                 .toList();
     }
 
-    public TecnicoResponse buscarPorId(Integer idTrabajador) {
+    public List<TecnicoResponse> listarActivos() {
+        return tecnicoRepository
+                .findByTrabajadorEstado(Estado.ACTIVO)
+                .stream()
+                .map(tecnicoMapper::toResponse)
+                .toList();
+    }
 
-        Tecnico tecnico = tecnicoRepository.findById(idTrabajador)
-                .orElseThrow(() -> new RuntimeException(
-                        "Técnico no encontrado"
-                ));
+    public TecnicoResponse buscarPorId(Integer id) {
+        Tecnico tecnico = tecnicoRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "Técnico no encontrado"
+                        ));
+
+        return tecnicoMapper.toResponse(tecnico);
+    }
+
+    public TecnicoResponse buscarActivoPorId(Integer id) {
+        Tecnico tecnico = tecnicoRepository
+                .findByIdTrabajadorAndTrabajadorEstado(
+                        id,
+                        Estado.ACTIVO
+                )
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "Técnico no encontrado"
+                        ));
 
         return tecnicoMapper.toResponse(tecnico);
     }
 
     @Transactional
-    public TecnicoResponse insertar(Integer idTrabajador, TecnicoRequest request) {
+    public TecnicoResponse crearTecnico(
+            TecnicoCreateRequest request) {
 
-        Trabajador trabajador = trabajadorRepository.findById(idTrabajador)
-                .orElseThrow(() -> new RuntimeException(
-                        "Trabajador no encontrado"
-                ));
+        if (usuarioRepository
+                .findByCorreo(request.correo())
+                .isPresent()) {
 
-        if (trabajador.getUsuario().getRol() != RolesEnum.TECNICO) {
-            throw new RuntimeException(
-                    "El trabajador no tiene el rol de TECNICO"
+            throw new IllegalArgumentException(
+                    "El correo ya está registrado"
             );
         }
 
-        if (tecnicoRepository.existsById(idTrabajador)) {
-            throw new RuntimeException(
-                    "El trabajador ya está registrado como técnico"
+        if (trabajadorRepository
+                .findByDni(request.dni())
+                .isPresent()) {
+
+            throw new IllegalArgumentException(
+                    "El DNI ya está registrado"
             );
         }
+
+        Usuario usuario = Usuario.builder()
+                .correo(request.correo())
+                .contraseña(
+                        passwordEncoder.encode(
+                                request.contraseña()
+                        )
+                )
+                .estado(Estado.ACTIVO)
+                .rol(RolesEnum.TECNICO)
+                .build();
+
+        usuario = usuarioRepository.save(usuario);
+
+        Trabajador trabajador = Trabajador.builder()
+                .nombres(request.nombres())
+                .apellidos(request.apellidos())
+                .dni(request.dni())
+                .telefono(request.telefono())
+                .direccion(request.direccion())
+                .fechaIngreso(request.fechaIngreso())
+                .estado(Estado.ACTIVO)
+                .usuario(usuario)
+                .build();
+
+        trabajador = trabajadorRepository.save(trabajador);
 
         Tecnico tecnico = tecnicoMapper.toEntity(
                 request,
@@ -73,28 +131,108 @@ public class TecnicoService {
     }
 
     @Transactional
-    public TecnicoResponse actualizar(Integer idTrabajador,TecnicoRequest request) {
+    public TecnicoResponse actualizarTecnico(
+            Integer id,
+            TecnicoUpdateRequest request) {
 
-        Tecnico tecnico = tecnicoRepository.findById(idTrabajador)
-                .orElseThrow(() -> new RuntimeException(
-                        "Técnico no encontrado"
-                ));
+        Tecnico tecnico = tecnicoRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "Técnico no encontrado"
+                        ));
 
-        tecnico.setEspecialidad(
-                request.especialidad()
-        );
+        Trabajador trabajador = tecnico.getTrabajador();
+        Usuario usuario = trabajador.getUsuario();
 
-        tecnico.setNivelTecnico(
-                request.nivelTecnico()
-        );
+        if (request.nombres() != null) {
+            trabajador.setNombres(request.nombres());
+        }
 
-        tecnico.setCertificacion(
-                request.certificacion()
-        );
+        if (request.apellidos() != null) {
+            trabajador.setApellidos(request.apellidos());
+        }
 
-        tecnico = tecnicoRepository.save(tecnico);
+        if (request.dni() != null
+                && !trabajador.getDni().equals(request.dni())) {
+
+            if (trabajadorRepository
+                    .findByDni(request.dni())
+                    .isPresent()) {
+
+                throw new IllegalArgumentException(
+                        "El DNI ya está registrado"
+                );
+            }
+
+            trabajador.setDni(request.dni());
+        }
+
+        if (request.telefono() != null) {
+            trabajador.setTelefono(request.telefono());
+        }
+
+        if (request.direccion() != null) {
+            trabajador.setDireccion(request.direccion());
+        }
+
+        if (request.fechaIngreso() != null) {
+            trabajador.setFechaIngreso(
+                    request.fechaIngreso()
+            );
+        }
+
+        if (request.correo() != null
+                && !usuario.getCorreo()
+                        .equals(request.correo())) {
+
+            if (usuarioRepository
+                    .findByCorreo(request.correo())
+                    .isPresent()) {
+
+                throw new IllegalArgumentException(
+                        "El correo ya está registrado"
+                );
+            }
+
+            usuario.setCorreo(request.correo());
+        }
+
+        if (request.especialidad() != null) {
+            tecnico.setEspecialidad(
+                    request.especialidad()
+            );
+        }
+
+        if (request.nivelTecnico() != null) {
+            tecnico.setNivelTecnico(
+                    request.nivelTecnico()
+            );
+        }
+
+
+
+        usuarioRepository.save(usuario);
+        trabajadorRepository.save(trabajador);
+        tecnicoRepository.save(tecnico);
 
         return tecnicoMapper.toResponse(tecnico);
     }
 
+    @Transactional
+    public void eliminarTecnico(Integer id) {
+
+        Tecnico tecnico = tecnicoRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "Técnico no encontrado"
+                        ));
+
+        Trabajador trabajador = tecnico.getTrabajador();
+
+        trabajador.setEstado(Estado.INACTIVO);
+
+        trabajadorRepository.save(trabajador);
+    }
 }

@@ -5,9 +5,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 import com.linde.linde_backend.repositories.usuario.UsuarioRepository;
-import com.linde.linde_backend.utils.AuthRequest;
-import com.linde.linde_backend.utils.AuthResponse;
-import com.linde.linde_backend.utils.RefreshTokenRequest;
+import com.linde.linde_backend.utils.auth.AuthRequest;
+import com.linde.linde_backend.utils.auth.AuthResponse;
+import com.linde.linde_backend.utils.auth.RefreshTokenRequest;
 
 import lombok.RequiredArgsConstructor;
 

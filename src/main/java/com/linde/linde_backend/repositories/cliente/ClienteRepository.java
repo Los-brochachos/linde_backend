@@ -13,7 +13,7 @@ public interface ClienteRepository extends JpaRepository<Cliente,Integer>{
 
     List<Cliente> findByUsuarioEstado(Estado estado);
 
-    Optional<Cliente> findByIdAndUsuarioEstado(
+    Optional<Cliente> findByIdClienteAndUsuarioEstado(
             Integer idCliente,
             Estado estado
     );

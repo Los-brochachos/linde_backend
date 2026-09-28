@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.linde.linde_backend.services.AuthService;
-import com.linde.linde_backend.utils.AuthRequest;
-import com.linde.linde_backend.utils.AuthResponse;
-import com.linde.linde_backend.utils.RefreshTokenRequest;
+import com.linde.linde_backend.utils.auth.AuthRequest;
+import com.linde.linde_backend.utils.auth.AuthResponse;
+import com.linde.linde_backend.utils.auth.RefreshTokenRequest;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
