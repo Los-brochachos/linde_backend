@@ -1,76 +1,176 @@
 package com.linde.linde_backend.services.cisterna;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.linde.linde_backend.dto.cisterna.CisternaRequest;
-import com.linde.linde_backend.dto.cisterna.CisternaResponse;
-import com.linde.linde_backend.dto.cisterna.EditarCisternaRequest;
-import com.linde.linde_backend.dto.cisterna.EliminarCisternaRequest;
+import com.linde.linde_backend.dto.cisterna.cisterna.CisternaRequest;
+import com.linde.linde_backend.dto.cisterna.cisterna.CisternaResponse;
+import com.linde.linde_backend.dto.cisterna.cisterna.EditarCisternaRequest;
+import com.linde.linde_backend.dto.cisterna.cisterna.EliminarCisternaRequest;
 import com.linde.linde_backend.entities.cisterna.Cisterna;
 import com.linde.linde_backend.mappers.cisterna.CisternaMapper;
 import com.linde.linde_backend.repositories.cisterna.CisternaRepository;
+import com.linde.linde_backend.utils.Estado;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-@Service 
-@RequiredArgsConstructor 
+@Service
+@RequiredArgsConstructor
 public class CisternaService {
-    
+
     private final CisternaRepository repository;
     private final CisternaMapper mapper;
 
-    public List<CisternaResponse> listar(){
-        return repository.findAll().stream()
-            .map(mapper::toDto)
-            .toList();
-    }    
-
-    public Optional<CisternaResponse> findByPlaca(String placa){
-        return repository.findByPlaca(placa)
-            .map(mapper::toDto);
+    // LISTAR TODAS
+    public List<CisternaResponse> listar() {
+        return repository.findAll()
+                .stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
-    public Optional<CisternaResponse> findByNombre(String nombre){
-        return repository.findByNombre(nombre)
-            .map(mapper::toDto);
+    // LISTAR ACTIVAS
+    public List<CisternaResponse> listarActivas() {
+        return repository.findByEstado(Estado.ACTIVO)
+                .stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
-    @Transactional 
-    public CisternaResponse crear(CisternaRequest request){
+    // BUSCAR POR PLACA
+    public CisternaResponse buscarPorPlaca(String placa) {
+        Cisterna cisterna = repository.findByPlaca(placa)
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "No se encontró una cisterna con la placa: " + placa));
+
+        return mapper.toDto(cisterna);
+    }
+
+    // BUSCAR POR NOMBRE
+    public CisternaResponse buscarPorNombre(String nombre) {
+        Cisterna cisterna = repository.findByNombre(nombre)
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "No se encontró una cisterna con el nombre: " + nombre));
+
+        return mapper.toDto(cisterna);
+    }
+
+    // BUSCAR POR ID
+    public CisternaResponse buscarPorId(Integer id) {
+        Cisterna cisterna = repository.findById(id)
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "Cisterna no encontrada"));
+
+        return mapper.toDto(cisterna);
+    }
+
+    // BUSCAR ACTIVA POR ID
+    public CisternaResponse buscarActivaPorId(Integer id) {
+        Cisterna cisterna = repository
+                .findByIdCisternaAndEstado(id, Estado.ACTIVO)
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "Cisterna no encontrada o está inactiva"));
+
+        return mapper.toDto(cisterna);
+    }
+
+    // CREAR
+    @Transactional
+    public CisternaResponse crear(CisternaRequest request) {
+
+        if (repository.existsByPlaca(request.placa())) {
+            throw new IllegalArgumentException(
+                    "La placa ya está registrada");
+        }
+
+        if (repository.existsByNombre(request.nombre())) {
+            throw new IllegalArgumentException(
+                    "El nombre de la cisterna ya está registrado");
+        }
+
         Cisterna cisterna = mapper.toEntity(request);
-        return mapper.toDto(repository.save(cisterna));
-    }
-    
-    @Transactional 
-    public CisternaResponse eliminar(EliminarCisternaRequest request) { 
-        return repository.findByNombre(request.nombre()) 
-            .map(cisterna -> {
-                cisterna.setEstado("INACTIVO"); 
-                Cisterna cisternaGuardada = repository.save(cisterna);
-                return mapper.toDto(cisternaGuardada);
-            })
-            .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
-            HttpStatus.NOT_FOUND, "La cisterna '" + request.nombre() + "' no existe."));
+
+        cisterna.setEstado(Estado.ACTIVO);
+
+        Cisterna guardada = repository.save(cisterna);
+
+        return mapper.toDto(guardada);
     }
 
-    @Transactional 
-public CisternaResponse editar(EditarCisternaRequest request) {
-    return repository.findByNombre(request.nombreBuscar())
-        .map(cisterna -> {
-            if (request.placa() != null) cisterna.setPlaca(request.placa());
-            if (request.nombre() != null) cisterna.setNombre(request.nombre()); 
-            if (request.capacidad() != null) cisterna.setCapacidad(request.capacidad());
-            
-            Cisterna cisternaGuardada = repository.save(cisterna);
-            return mapper.toDto(cisternaGuardada);
-        })
-        .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
-            HttpStatus.NOT_FOUND, "La cisterna '" + request.nombreBuscar() + "' no existe."
-        ));
-}
+    // EDITAR
+    @Transactional
+    public CisternaResponse editar(EditarCisternaRequest request) {
+
+        Cisterna cisterna = repository
+                .findByNombre(request.nombreBuscar())
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "La cisterna '" +
+                                request.nombreBuscar() +
+                                "' no existe"));
+
+        // Validar placa si se desea modificar
+        if (request.placa() != null
+                && !request.placa().equals(cisterna.getPlaca())
+                && repository.existsByPlaca(request.placa())) {
+
+            throw new IllegalArgumentException(
+                    "La placa ya está registrada");
+        }
+
+        // Validar nombre si se desea modificar
+        if (request.nombre() != null && !request.nombre().equals(cisterna.getNombre()) && repository.existsByNombre(request.nombre())) {
+
+            throw new IllegalArgumentException(
+                    "El nombre de la cisterna ya está registrado");
+        }
+
+        if (request.placa() != null) {
+            cisterna.setPlaca(request.placa());
+        }
+
+        if (request.nombre() != null) {
+            cisterna.setNombre(request.nombre());
+        }
+
+        if (request.capacidad() != null) {
+            cisterna.setCapacidad(request.capacidad());
+        }
+
+        Cisterna actualizada = repository.save(cisterna);
+
+        return mapper.toDto(actualizada);
+    }
+
+    // ELIMINAR LÓGICAMENTE
+    @Transactional
+    public CisternaResponse eliminar(
+            EliminarCisternaRequest request) {
+
+        Cisterna cisterna = repository
+                .findByNombre(request.nombre())
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "La cisterna '" +
+                                request.nombre() +
+                                "' no existe"));
+
+        if (cisterna.getEstado() == Estado.INACTIVO) {
+            throw new IllegalArgumentException(
+                    "La cisterna ya está inactiva");
+        }
+
+        cisterna.setEstado(Estado.INACTIVO);
+
+        Cisterna actualizada = repository.save(cisterna);
+
+        return mapper.toDto(actualizada);
+    }
 }

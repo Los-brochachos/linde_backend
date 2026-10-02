@@ -18,5 +18,7 @@ public interface ConductorRepository extends JpaRepository<Conductor, Integer> {
     );
 
     Optional<Conductor> findByLicenciaConducir(String licenciaConducir);
+
+    Optional<Conductor> findByTrabajadorUsuarioCorreo(String correo);
 }
 

@@ -2,42 +2,63 @@ package com.linde.linde_backend.mappers.cisterna;
 
 import org.springframework.stereotype.Component;
 
-import com.linde.linde_backend.dto.cisterna.HistorialMantenimientoRequest;
-import com.linde.linde_backend.dto.cisterna.HistorialMantenimientoResponse;
-import com.linde.linde_backend.entities.cisterna.Cisterna;
+import com.linde.linde_backend.dto.cisterna.historialmantenimiento.HistorialMantenimientoRequest;
+import com.linde.linde_backend.dto.cisterna.historialmantenimiento.HistorialMantenimientoResponse;
 import com.linde.linde_backend.entities.cisterna.Falla;
 import com.linde.linde_backend.entities.cisterna.HistorialMantenimiento;
-import com.linde.linde_backend.entities.trabajador.Tecnico;
 
-@Component 
+@Component
 public class HistorialMantenimientoMapper {
-    public HistorialMantenimiento toEntity(HistorialMantenimientoRequest dto){
-        if(dto==null)return null; 
-            Cisterna cisterna = Cisterna.builder().idCisterna(dto.idCisterna()).build();
-            Falla falla = Falla.builder().idFalla(dto.idFalla()).build();
-            Tecnico tecnico = Tecnico.builder().idTrabajador(dto.idTrabajador()).build();
-            return HistorialMantenimiento.builder()
-            .fecha(dto.fecha())
-            .descripcion(dto.descripcion())
-            .resultado(dto.resultado())
-            .observaciones(dto.observaciones())
-            .costo(dto.costo())
-            .cisterna(cisterna)
-            .falla(falla)
-            .tecnico(tecnico)
-            .build();
+
+    public HistorialMantenimiento toEntity(
+            HistorialMantenimientoRequest dto) {
+
+        if (dto == null) {
+            return null;
         }
-    public HistorialMantenimientoResponse toDto(HistorialMantenimiento entity){
+
+        Falla falla = Falla.builder()
+                .idFalla(dto.idFalla())
+                .build();
+
+        return HistorialMantenimiento.builder()
+                .fecha(dto.fecha())
+                .descripcion(dto.descripcion())
+                .resultado(dto.resultado())
+                .observaciones(dto.observaciones())
+                .costo(dto.costo())
+                .falla(falla)
+                .build();
+    }
+
+    public HistorialMantenimientoResponse toDto(
+            HistorialMantenimiento entity) {
+
+        if (entity == null) {
+            return null;
+        }
+
+        Falla falla = entity.getFalla();
+
         return new HistorialMantenimientoResponse(
-            entity.getIdHistorial(),
-            entity.getFecha(), 
-            entity.getDescripcion(),
-            entity.getResultado(),
-            entity.getObservaciones(),
-            entity.getCosto(),
-            entity.getCisterna() != null ? entity.getCisterna().getIdCisterna() : null,
-            entity.getFalla() != null ? entity.getFalla().getIdFalla() : null,
-            entity.getTecnico() != null ? entity.getTecnico().getIdTrabajador() : null
-            );
+                entity.getIdHistorial(),
+                entity.getFecha(),
+                entity.getDescripcion(),
+                entity.getResultado(),
+                entity.getObservaciones(),
+                entity.getCosto(),
+
+                falla != null
+                        ? falla.getIdFalla()
+                        : null,
+
+                falla != null && falla.getCisterna() != null
+                        ? falla.getCisterna().getIdCisterna()
+                        : null,
+
+                falla != null && falla.getTecnico() != null
+                        ? falla.getTecnico().getIdTrabajador()
+                        : null
+        );
     }
 }

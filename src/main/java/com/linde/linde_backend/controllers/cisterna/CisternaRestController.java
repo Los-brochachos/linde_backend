@@ -13,54 +13,101 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import lombok.RequiredArgsConstructor;
-
-import com.linde.linde_backend.dto.cisterna.CisternaRequest;
-import com.linde.linde_backend.dto.cisterna.CisternaResponse;
-import com.linde.linde_backend.dto.cisterna.EditarCisternaRequest;
-import com.linde.linde_backend.dto.cisterna.EliminarCisternaRequest;
+import com.linde.linde_backend.dto.cisterna.cisterna.CisternaRequest;
+import com.linde.linde_backend.dto.cisterna.cisterna.CisternaResponse;
+import com.linde.linde_backend.dto.cisterna.cisterna.EditarCisternaRequest;
+import com.linde.linde_backend.dto.cisterna.cisterna.EliminarCisternaRequest;
 import com.linde.linde_backend.services.cisterna.CisternaService;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
-@RestController 
-@RequestMapping("api/v1/cisternas")
-@RequiredArgsConstructor 
+@RestController
+@RequestMapping("/api/v1/cisternas")
+@RequiredArgsConstructor
 public class CisternaRestController {
-    
+
     private final CisternaService service;
 
-    @GetMapping 
-    public ResponseEntity<List<CisternaResponse>> listar(){
+    // LISTAR TODAS
+    @GetMapping
+    public ResponseEntity<List<CisternaResponse>> listar() {
         return ResponseEntity.ok(service.listar());
     }
 
-    @GetMapping("/placa/{placa}") 
-    public ResponseEntity<CisternaResponse> findByPlaca(@PathVariable String placa){
-        return service.findByPlaca(placa)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    // LISTAR ACTIVAS
+    @GetMapping("/activas")
+    public ResponseEntity<List<CisternaResponse>> listarActivas() {
+        return ResponseEntity.ok(service.listarActivas());
     }
 
+    // BUSCAR POR ID
+    @GetMapping("/{id}")
+    public ResponseEntity<CisternaResponse> buscarPorId(
+            @PathVariable Integer id) {
+
+        return ResponseEntity.ok(
+                service.buscarPorId(id)
+        );
+    }
+
+    // BUSCAR ACTIVA POR ID
+    @GetMapping("/{id}/activa")
+    public ResponseEntity<CisternaResponse> buscarActivaPorId(
+            @PathVariable Integer id) {
+
+        return ResponseEntity.ok(
+                service.buscarActivaPorId(id)
+        );
+    }
+
+    // BUSCAR POR PLACA
+    @GetMapping("/placa/{placa}")
+    public ResponseEntity<CisternaResponse> buscarPorPlaca(
+            @PathVariable String placa) {
+
+        return ResponseEntity.ok(
+                service.buscarPorPlaca(placa)
+        );
+    }
+
+    // BUSCAR POR NOMBRE
     @GetMapping("/nombre/{nombre}")
-    public ResponseEntity<CisternaResponse> findByNombre(@PathVariable String nombre){
-        return service.findByNombre(nombre)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<CisternaResponse> buscarPorNombre(
+            @PathVariable String nombre) {
+
+        return ResponseEntity.ok(
+                service.buscarPorNombre(nombre)
+        );
     }
 
-    @PostMapping 
-    public ResponseEntity<CisternaResponse> crear(@Valid @RequestBody CisternaRequest request){
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.crear(request));
+    // CREAR
+    @PostMapping
+    public ResponseEntity<CisternaResponse> crear(
+            @Valid @RequestBody CisternaRequest request) {
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(service.crear(request));
     }
 
+    // EDITAR
     @PutMapping
-    public ResponseEntity<CisternaResponse> editar(@Valid @RequestBody EditarCisternaRequest request){
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.editar(request));
+    public ResponseEntity<CisternaResponse> editar(
+            @Valid @RequestBody EditarCisternaRequest request) {
+
+        return ResponseEntity.ok(
+                service.editar(request)
+        );
     }
 
+    // DESACTIVAR
     @DeleteMapping
-    public ResponseEntity<CisternaResponse> eliminar(@Valid @RequestBody EliminarCisternaRequest request){
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.eliminar(request));
+    public ResponseEntity<CisternaResponse> eliminar(
+            @Valid @RequestBody EliminarCisternaRequest request) {
+
+        return ResponseEntity.ok(
+                service.eliminar(request)
+        );
     }
 }

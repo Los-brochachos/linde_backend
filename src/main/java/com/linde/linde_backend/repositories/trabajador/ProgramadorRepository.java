@@ -8,7 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.linde.linde_backend.entities.trabajador.Programador;
 import com.linde.linde_backend.utils.Estado;
 
-public interface ProgramadorRepository extends JpaRepository<Programador, Integer> {
+public interface ProgramadorRepository
+        extends JpaRepository<Programador, Integer> {
 
     List<Programador> findByTrabajadorEstado(Estado estado);
 
@@ -16,5 +17,8 @@ public interface ProgramadorRepository extends JpaRepository<Programador, Intege
             Integer idTrabajador,
             Estado estado
     );
-}
 
+    Optional<Programador> findByTrabajadorUsuarioCorreo(
+            String correo
+    );
+}
