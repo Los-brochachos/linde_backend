@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -35,6 +36,43 @@ public class PedidoRestController {
         return ResponseEntity.ok(service.listar());
     }
 
+    @GetMapping("/mis-pedidos")
+    public ResponseEntity<List<PedidoResponse>> listarMisPedidos(
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                service.listarMisPedidos(authentication.getName())
+        );
+    }
+
+    @GetMapping("/mis-pedidos/{id}")
+    public ResponseEntity<PedidoResponse> buscarMiPedido(
+            @PathVariable Integer id,
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                service.buscarMiPedido(
+                        id,
+                        authentication.getName()
+                )
+        );
+    }
+
+    @PatchMapping("/mis-pedidos/{id}/cancelar")
+    public ResponseEntity<PedidoResponse> cancelarMiPedido(
+            @PathVariable Integer id,
+            Authentication authentication,
+            @Valid @RequestBody CancelarPedidoRequest request) {
+
+        return ResponseEntity.ok(
+                service.cancelarMiPedido(
+                        id,
+                        request,
+                        authentication.getName()
+                )
+        );
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PedidoResponse> buscarPorId(
             @PathVariable Integer id) {
@@ -44,11 +82,12 @@ public class PedidoRestController {
 
     @PostMapping
     public ResponseEntity<PedidoResponse> insertar(
+            Authentication authentication, 
             @Valid @RequestBody PedidoRequest request) {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(service.insertar(request));
+                .body(service.insertar(request,authentication.getName()));
     }
 
     @PatchMapping("/{id}/estado")

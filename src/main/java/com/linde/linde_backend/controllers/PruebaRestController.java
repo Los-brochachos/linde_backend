@@ -10,6 +10,6 @@ public class PruebaRestController {
 
     @GetMapping
     public String prueba() {
-        return "Acceso autorizado";
+        return "Acceso autorizado, para todo el público";
     }
 }

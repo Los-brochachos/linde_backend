@@ -177,4 +177,75 @@ public class ClienteService {
         usuario.setEstado(Estado.INACTIVO);
         usuarioRepository.save(usuario);
     }
+
+    public ClienteResponse me(String correo) {
+
+        Usuario usuario = usuarioRepository.findByCorreo(correo)
+                .orElseThrow(() ->
+                        new NoSuchElementException("Usuario no encontrado"));
+
+        Cliente cliente = clienteRepository
+                .findByUsuario(usuario)
+                .orElseThrow(() ->
+                        new NoSuchElementException("Cliente no encontrado"));
+
+        return clienteMapper.toDto(cliente);
+    }
+
+    @Transactional
+    public ClienteResponse actualizarMe(
+            String correoActual,
+            ClienteUpdateRequest request) {
+
+        Usuario usuario = usuarioRepository.findByCorreo(correoActual)
+                .orElseThrow(() ->
+                        new NoSuchElementException("Usuario no encontrado"));
+
+        Cliente cliente = clienteRepository.findByUsuario(usuario)
+                .orElseThrow(() ->
+                        new NoSuchElementException("Cliente no encontrado"));
+
+        if (request.ruc() != null) {
+            cliente.setRuc(request.ruc());
+        }
+
+        if (request.razonSocial() != null) {
+            cliente.setRazonSocial(request.razonSocial());
+        }
+
+        if (request.direccion() != null) {
+            cliente.setDireccion(request.direccion());
+        }
+
+        if (request.telefono() != null) {
+            cliente.setTelefono(request.telefono());
+        }
+
+        if (request.correo() != null
+                && !usuario.getCorreo().equals(request.correo())) {
+
+            if (usuarioRepository
+                    .findByCorreo(request.correo())
+                    .isPresent()) {
+
+                throw new IllegalArgumentException(
+                        "El correo ya está registrado");
+            }
+
+            usuario.setCorreo(request.correo());
+        }
+
+        if (request.contraseña() != null
+                && !request.contraseña().isBlank()) {
+
+            usuario.setContraseña(
+                    passwordEncoder.encode(request.contraseña())
+            );
+        }
+
+        usuarioRepository.save(usuario);
+        clienteRepository.save(cliente);
+
+        return clienteMapper.toDto(cliente);
+    }
 }

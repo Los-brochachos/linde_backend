@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.linde.linde_backend.entities.trabajador.Trabajador;
+import com.linde.linde_backend.entities.usuario.Usuario;
 import com.linde.linde_backend.utils.Estado;
 
 public interface TrabajadorRepository extends JpaRepository<Trabajador, Integer> {
@@ -18,6 +19,8 @@ public interface TrabajadorRepository extends JpaRepository<Trabajador, Integer>
     );
 
     Optional<Trabajador> findByDni(String dni);
+
+    Optional<Trabajador> findByUsuario(Usuario usuario);
 
     Optional<Trabajador> findByDniAndEstado(
         String dni,

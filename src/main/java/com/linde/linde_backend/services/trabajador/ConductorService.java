@@ -333,4 +333,33 @@ public class ConductorService {
         trabajadorRepository.save(trabajador);
         usuarioRepository.save(usuario);
     }
+
+
+    public ConductorResponse me(String correo) {
+
+        Usuario usuario = usuarioRepository.findByCorreo(correo)
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "Usuario no encontrado"
+                        )
+                );
+
+        Trabajador trabajador = trabajadorRepository
+                .findByUsuario(usuario)
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "Trabajador no encontrado"
+                        )
+                );
+
+        Conductor conductor = conductorRepository
+                .findById(trabajador.getIdTrabajador())
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "Conductor no encontrado"
+                        )
+                );
+
+        return conductorMapper.toResponse(conductor);
+        }
 }

@@ -3,6 +3,7 @@ package com.linde.linde_backend.controllers.pedido;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,61 +25,92 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DetallePedidoRestController {
 
-        private final DetallePedidoService detallePedidoService;
+    private final DetallePedidoService detallePedidoService;
 
-        @GetMapping("/{idPedido}/detalles")
-        public ResponseEntity<List<DetallePedidoResponse>> listarActivosPorPedido(
-                @PathVariable Integer idPedido) {
+    // CLIENTE: listar detalles activos de su propio pedido
+    @GetMapping("/{idPedido}/detalles")
+    public ResponseEntity<List<DetallePedidoResponse>> listarActivosPorPedidoCliente(
+            @PathVariable Integer idPedido,
+            Authentication authentication) {
 
-                return ResponseEntity.ok(
-                        detallePedidoService.listarActivosPorPedido(idPedido)
-                );
-        }
+        return ResponseEntity.ok(
+                detallePedidoService.listarActivosPorPedidoCliente(
+                        idPedido,
+                        authentication.getName()
+                )
+        );
+    }
 
-        @GetMapping("/{idPedido}/detalles/todos")
-        public ResponseEntity<List<DetallePedidoResponse>> listarTodosPorPedido(
-                @PathVariable Integer idPedido) {
+    // ADMIN / ANALISTA / PROGRAMADOR:
+    // listar detalles activos de cualquier pedido
+    @GetMapping("/{idPedido}/detalles/activos")
+    public ResponseEntity<List<DetallePedidoResponse>> listarActivosPorPedido(
+            @PathVariable Integer idPedido) {
 
-                return ResponseEntity.ok(
-                        detallePedidoService.listarTodosPorPedido(idPedido)
-                );
-        }
+        return ResponseEntity.ok(
+                detallePedidoService.listarActivosPorPedido(idPedido)
+        );
+    }
 
-        @PostMapping("/{idPedido}/detalles")
-        public ResponseEntity<DetallePedidoResponse> agregarDetalle(
-                @PathVariable Integer idPedido,
-                @Valid @RequestBody DetallePedidoRequest request) {
+    // ADMIN / ANALISTA / PROGRAMADOR:
+    // listar todos los detalles, incluidos los inactivos
+    @GetMapping("/{idPedido}/detalles/todos")
+    public ResponseEntity<List<DetallePedidoResponse>> listarTodosPorPedido(
+            @PathVariable Integer idPedido) {
 
-                return ResponseEntity.ok(
-                        detallePedidoService.agregarDetalle(idPedido, request)
-                );
-        }
+        return ResponseEntity.ok(
+                detallePedidoService.listarTodosPorPedido(idPedido)
+        );
+    }
 
-        @PatchMapping("/{idPedido}/detalles/{idDetalle}/cantidad")
-        public ResponseEntity<DetallePedidoResponse> agregarCantidad(
-                @PathVariable Integer idPedido,
-                @PathVariable Integer idDetalle,
-                @Valid @RequestBody AgregarCantidadDetalleRequest request) {
+    // CLIENTE: agregar detalle a su propio pedido
+    @PostMapping("/{idPedido}/detalles")
+    public ResponseEntity<DetallePedidoResponse> agregarDetalle(
+            @PathVariable Integer idPedido,
+            @Valid @RequestBody DetallePedidoRequest request,
+            Authentication authentication) {
 
-                return ResponseEntity.ok(
-                        detallePedidoService.agregarCantidad(
-                                idPedido,
-                                idDetalle,
-                                request
-                        )
-                );
-        }
+        return ResponseEntity.ok(
+                detallePedidoService.agregarDetalleCliente(
+                        idPedido,
+                        request,
+                        authentication.getName()
+                )
+        );
+    }
 
-        @PatchMapping("/{idPedido}/detalles/{idDetalle}/cancelar")
-        public ResponseEntity<DetallePedidoResponse> cancelar(
-                @PathVariable Integer idPedido,
-                @PathVariable Integer idDetalle) {
+    // CLIENTE: aumentar cantidad de un detalle de su propio pedido
+    @PatchMapping("/{idPedido}/detalles/{idDetalle}/cantidad")
+    public ResponseEntity<DetallePedidoResponse> agregarCantidad(
+            @PathVariable Integer idPedido,
+            @PathVariable Integer idDetalle,
+            @Valid @RequestBody AgregarCantidadDetalleRequest request,
+            Authentication authentication) {
 
-                return ResponseEntity.ok(
-                        detallePedidoService.cancelar(
-                                idPedido,
-                                idDetalle
-                        )
-                );
-        }
+        return ResponseEntity.ok(
+                detallePedidoService.agregarCantidadCliente(
+                        idPedido,
+                        idDetalle,
+                        request,
+                        authentication.getName()
+                )
+        );
+    }
+
+    // CLIENTE: cancelar un detalle de su propio pedido
+    @PatchMapping("/{idPedido}/detalles/{idDetalle}/cancelar")
+    public ResponseEntity<DetallePedidoResponse> cancelar(
+            @PathVariable Integer idPedido,
+            @PathVariable Integer idDetalle,
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                detallePedidoService.cancelarCliente(
+                        idPedido,
+                        idDetalle,
+                        authentication.getName()
+                )
+        );
+    }
 }
+

@@ -67,6 +67,26 @@ public class UsuarioService implements UserDetailsService {
     }
 
     @Transactional
+    public UsuarioResponse actualizarMe(
+            String correoActual,
+            UsuarioUpdateRequest request) {
+
+        Usuario usuario = repository.findByCorreo(correoActual)
+                .orElseThrow(() ->
+                        new NoSuchElementException("Usuario no encontrado"));
+
+        if (!usuario.getCorreo().equals(request.correo())
+                && repository.findByCorreo(request.correo()).isPresent()) {
+
+            throw new IllegalArgumentException("El correo ya está registrado");
+        }
+
+        usuario.setCorreo(request.correo());
+
+        return mapper.toResponse(usuario);
+    }
+
+    @Transactional
     public void desactivar(Integer id) {
 
         Usuario usuario = repository.findById(id)

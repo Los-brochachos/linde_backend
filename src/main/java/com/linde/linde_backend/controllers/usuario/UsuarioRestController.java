@@ -6,8 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,26 +21,21 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/usuarios")
-@RequiredArgsConstructor 
+@RequiredArgsConstructor
 public class UsuarioRestController {
 
     private final UsuarioService service;
 
     @GetMapping
     public ResponseEntity<List<UsuarioResponse>> findAll() {
-
-        return ResponseEntity.ok(
-                service.findAll()
-        );
+        return ResponseEntity.ok(service.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponse> findById(
             @PathVariable Integer id) {
 
-        return ResponseEntity.ok(
-                service.findById(id)
-        );
+        return ResponseEntity.ok(service.findById(id));
     }
 
     @GetMapping("/me")
@@ -52,7 +47,17 @@ public class UsuarioRestController {
         );
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping ("/me")
+    public ResponseEntity<UsuarioResponse> actualizarMe(
+            Authentication authentication,
+            @Valid @RequestBody UsuarioUpdateRequest request) {
+
+        return ResponseEntity.ok(
+                service.actualizarMe(authentication.getName(), request)
+        );
+    }
+
+    @PatchMapping("/{id}")
     public ResponseEntity<UsuarioResponse> actualizar(
             @PathVariable Integer id,
             @Valid @RequestBody UsuarioUpdateRequest request) {
@@ -68,9 +73,6 @@ public class UsuarioRestController {
 
         service.desactivar(id);
 
-        return ResponseEntity
-                .noContent()
-                .build();
+        return ResponseEntity.noContent().build();
     }
 }
-

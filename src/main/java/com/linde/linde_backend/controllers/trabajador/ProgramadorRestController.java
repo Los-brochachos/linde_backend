@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,71 +27,82 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor 
 public class ProgramadorRestController {
 
-    private final ProgramadorService programadorService;
+        private final ProgramadorService programadorService;
 
-    @GetMapping
-    public ResponseEntity<List<ProgramadorResponse>> listarTodos() {
-        return ResponseEntity.ok(
-                programadorService.listarTodos()
-        );
-    }
 
-    @GetMapping("/activos")
-    public ResponseEntity<List<ProgramadorResponse>> listarActivos() {
-        return ResponseEntity.ok(
-                programadorService.listarActivos()
-        );
-    }
+        @GetMapping
+        public ResponseEntity<List<ProgramadorResponse>> listarTodos() {
+                return ResponseEntity.ok(
+                        programadorService.listarTodos()
+                );
+        }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProgramadorResponse> buscarPorId(
-            @PathVariable Integer id) {
+        @GetMapping("/me")
+                public ResponseEntity<ProgramadorResponse> me(
+                        Authentication authentication) {
 
-        return ResponseEntity.ok(
-                programadorService.buscarPorId(id)
-        );
-    }
+                return ResponseEntity.ok(
+                        programadorService.me(authentication.getName())
+                );
+        }
 
-    @GetMapping("/{id}/activo")
-    public ResponseEntity<ProgramadorResponse> buscarActivoPorId(
-            @PathVariable Integer id) {
 
-        return ResponseEntity.ok(
-                programadorService.buscarActivoPorId(id)
-        );
-    }
+        @GetMapping("/activos")
+        public ResponseEntity<List<ProgramadorResponse>> listarActivos() {
+                return ResponseEntity.ok(
+                        programadorService.listarActivos()
+                );
+        }
 
-    @PostMapping
-    public ResponseEntity<ProgramadorResponse> crear(
-            @Valid @RequestBody ProgramadorCreateRequest request) {
+        @GetMapping("/{id}")
+        public ResponseEntity<ProgramadorResponse> buscarPorId(
+                @PathVariable Integer id) {
 
-        ProgramadorResponse response =
-                programadorService.crearProgramador(request);
+                return ResponseEntity.ok(
+                        programadorService.buscarPorId(id)
+                );
+        }
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
-    }
+        @GetMapping("/{id}/activo")
+        public ResponseEntity<ProgramadorResponse> buscarActivoPorId(
+                @PathVariable Integer id) {
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProgramadorResponse> actualizar(
-            @PathVariable Integer id,
-            @Valid @RequestBody ProgramadorUpdateRequest request) {
+                return ResponseEntity.ok(
+                        programadorService.buscarActivoPorId(id)
+                );
+        }
 
-        return ResponseEntity.ok(
-                programadorService.actualizarProgramador(
-                        id,
-                        request
-                )
-        );
-    }
+        @PostMapping
+        public ResponseEntity<ProgramadorResponse> crear(
+                @Valid @RequestBody ProgramadorCreateRequest request) {
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(
-            @PathVariable Integer id) {
+                ProgramadorResponse response =
+                        programadorService.crearProgramador(request);
 
-        programadorService.eliminarProgramador(id);
+                return ResponseEntity
+                        .status(HttpStatus.CREATED)
+                        .body(response);
+        }
 
-        return ResponseEntity.noContent().build();
-    }
+        @PutMapping("/{id}")
+        public ResponseEntity<ProgramadorResponse> actualizar(
+                @PathVariable Integer id,
+                @Valid @RequestBody ProgramadorUpdateRequest request) {
+
+                return ResponseEntity.ok(
+                        programadorService.actualizarProgramador(
+                                id,
+                                request
+                        )
+                );
+        }
+
+        @DeleteMapping("/{id}")
+        public ResponseEntity<Void> eliminar(
+                @PathVariable Integer id) {
+
+                programadorService.eliminarProgramador(id);
+
+                return ResponseEntity.noContent().build();
+        }
 }

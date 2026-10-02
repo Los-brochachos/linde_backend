@@ -4,8 +4,10 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -47,7 +49,30 @@ public class ClienteRestController {
             clienteS.listarActivos()
         );
     }
-    
+
+
+    @GetMapping("/me")
+    public ResponseEntity<ClienteResponse> me(
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                clienteS.me(authentication.getName())
+        );
+    }
+
+    @PatchMapping("/me")
+    public ResponseEntity<ClienteResponse> actualizarMe(
+            Authentication authentication,
+            @Valid @RequestBody ClienteUpdateRequest request) {
+
+        return ResponseEntity.ok(
+                clienteS.actualizarMe(
+                        authentication.getName(),
+                        request
+                )
+        );
+    }
+        
     // Buscar cliente por ID, sin importar su estado
     @GetMapping("/{id}")
     public ResponseEntity<ClienteResponse> buscarCliente(
@@ -65,10 +90,6 @@ public class ClienteRestController {
             clienteS.buscarActivoPorId(id)
         );
     }
-    
-
-
-
     
 
     @PostMapping("/register")
@@ -93,6 +114,8 @@ public class ClienteRestController {
 
         return ResponseEntity.ok(cliente);
     }
+
+    
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarCliente(

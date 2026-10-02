@@ -25,217 +25,245 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ProgramadorService {
-
-    private final ProgramadorRepository programadorRepository;
-    private final TrabajadorRepository trabajadorRepository;
-    private final UsuarioRepository usuarioRepository;
-    private final ProgramadorMapper programadorMapper;
-    private final PasswordEncoder passwordEncoder;
-
-    public List<ProgramadorResponse> listarTodos() {
-        return programadorRepository.findAll()
-                .stream()
-                .map(programadorMapper::toResponse)
-                .toList();
-    }
-
-    public List<ProgramadorResponse> listarActivos() {
-        return programadorRepository
-                .findByTrabajadorEstado(Estado.ACTIVO)
-                .stream()
-                .map(programadorMapper::toResponse)
-                .toList();
-    }
-
-    public ProgramadorResponse buscarPorId(Integer id) {
-        Programador programador = programadorRepository
-                .findById(id)
-                .orElseThrow(() ->
-                        new NoSuchElementException(
-                                "Programador no encontrado"
-                        ));
-
-        return programadorMapper.toResponse(programador);
-    }
-
-    public ProgramadorResponse buscarActivoPorId(Integer id) {
-        Programador programador = programadorRepository
-                .findByIdTrabajadorAndTrabajadorEstado(
-                        id,
-                        Estado.ACTIVO
-                )
-                .orElseThrow(() ->
-                        new NoSuchElementException(
-                                "Programador no encontrado"
-                        ));
-
-        return programadorMapper.toResponse(programador);
-    }
-
-    @Transactional
-    public ProgramadorResponse crearProgramador(
-            ProgramadorCreateRequest request) {
-
-        if (usuarioRepository
-                .findByCorreo(request.correo())
-                .isPresent()) {
-
-            throw new IllegalArgumentException(
-                    "El correo ya está registrado"
-            );
-        }
-
-        if (trabajadorRepository
-                .findByDni(request.dni())
-                .isPresent()) {
-
-            throw new IllegalArgumentException(
-                    "El DNI ya está registrado"
-            );
-        }
-
-        Usuario usuario = Usuario.builder()
-                .correo(request.correo())
-                .contraseña(
-                        passwordEncoder.encode(
-                                request.contraseña()
-                        )
-                )
-                .estado(Estado.ACTIVO)
-                .rol(RolesEnum.PROGRAMADOR)
-                .build();
-
-        usuario = usuarioRepository.save(usuario);
-
-        Trabajador trabajador = Trabajador.builder()
-                .nombres(request.nombres())
-                .apellidos(request.apellidos())
-                .dni(request.dni())
-                .telefono(request.telefono())
-                .direccion(request.direccion())
-                .fechaIngreso(request.fechaIngreso())
-                .estado(Estado.ACTIVO)
-                .usuario(usuario)
-                .build();
-
-        trabajador = trabajadorRepository.save(trabajador);
-
-        Programador programador =
-                programadorMapper.toEntity(
-                        request,
-                        trabajador
-                );
-
-        programador = programadorRepository.save(
-                programador
-        );
-
-        return programadorMapper.toResponse(
-                programador
-        );
-    }
-
-    @Transactional
-    public ProgramadorResponse actualizarProgramador(
-            Integer id,
-            ProgramadorUpdateRequest request) {
-
-        Programador programador = programadorRepository
-                .findById(id)
-                .orElseThrow(() ->
-                        new NoSuchElementException(
-                                "Programador no encontrado"
-                        ));
-
-        Trabajador trabajador = programador.getTrabajador();
-        Usuario usuario = trabajador.getUsuario();
-
-        if (request.nombres() != null) {
-            trabajador.setNombres(request.nombres());
-        }
-
-        if (request.apellidos() != null) {
-            trabajador.setApellidos(request.apellidos());
-        }
-
-        if (request.dni() != null
-                && !trabajador.getDni().equals(request.dni())) {
-
-            if (trabajadorRepository
-                    .findByDni(request.dni())
-                    .isPresent()) {
-
-                throw new IllegalArgumentException(
-                        "El DNI ya está registrado"
-                );
-            }
-
-            trabajador.setDni(request.dni());
-        }
-
-        if (request.telefono() != null) {
-            trabajador.setTelefono(request.telefono());
-        }
-
-        if (request.direccion() != null) {
-            trabajador.setDireccion(request.direccion());
-        }
-
-        if (request.fechaIngreso() != null) {
-            trabajador.setFechaIngreso(
-                    request.fechaIngreso()
-            );
-        }
         
+        private final ProgramadorRepository programadorRepository;
+        private final TrabajadorRepository trabajadorRepository;
+        private final UsuarioRepository usuarioRepository;
+        private final ProgramadorMapper programadorMapper;
+        private final PasswordEncoder passwordEncoder;
 
-        if (request.correo() != null
-                && !usuario.getCorreo()
-                        .equals(request.correo())) {
+        public List<ProgramadorResponse> listarTodos() {
+                return programadorRepository.findAll()
+                        .stream()
+                        .map(programadorMapper::toResponse)
+                        .toList();
+        }
 
-            if (usuarioRepository
-                    .findByCorreo(request.correo())
-                    .isPresent()) {
+        public List<ProgramadorResponse> listarActivos() {
+                return programadorRepository
+                        .findByTrabajadorEstado(Estado.ACTIVO)
+                        .stream()
+                        .map(programadorMapper::toResponse)
+                        .toList();
+        }
+
+        public ProgramadorResponse buscarPorId(Integer id) {
+                Programador programador = programadorRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new NoSuchElementException(
+                                        "Programador no encontrado"
+                                ));
+
+                return programadorMapper.toResponse(programador);
+        }
+
+        public ProgramadorResponse buscarActivoPorId(Integer id) {
+                Programador programador = programadorRepository
+                        .findByIdTrabajadorAndTrabajadorEstado(
+                                id,
+                                Estado.ACTIVO
+                        )
+                        .orElseThrow(() ->
+                                new NoSuchElementException(
+                                        "Programador no encontrado"
+                                ));
+
+                return programadorMapper.toResponse(programador);
+        }
+
+        @Transactional
+        public ProgramadorResponse crearProgramador(
+                ProgramadorCreateRequest request) {
+
+                if (usuarioRepository
+                        .findByCorreo(request.correo())
+                        .isPresent()) {
 
                 throw new IllegalArgumentException(
                         "El correo ya está registrado"
                 );
-            }
+                }
 
-            usuario.setCorreo(request.correo());
+                if (trabajadorRepository
+                        .findByDni(request.dni())
+                        .isPresent()) {
+
+                throw new IllegalArgumentException(
+                        "El DNI ya está registrado"
+                );
+                }
+
+                Usuario usuario = Usuario.builder()
+                        .correo(request.correo())
+                        .contraseña(
+                                passwordEncoder.encode(
+                                        request.contraseña()
+                                )
+                        )
+                        .estado(Estado.ACTIVO)
+                        .rol(RolesEnum.PROGRAMADOR)
+                        .build();
+
+                usuario = usuarioRepository.save(usuario);
+
+                Trabajador trabajador = Trabajador.builder()
+                        .nombres(request.nombres())
+                        .apellidos(request.apellidos())
+                        .dni(request.dni())
+                        .telefono(request.telefono())
+                        .direccion(request.direccion())
+                        .fechaIngreso(request.fechaIngreso())
+                        .estado(Estado.ACTIVO)
+                        .usuario(usuario)
+                        .build();
+
+                trabajador = trabajadorRepository.save(trabajador);
+
+                Programador programador =
+                        programadorMapper.toEntity(
+                                request,
+                                trabajador
+                        );
+
+                programador = programadorRepository.save(
+                        programador
+                );
+
+                return programadorMapper.toResponse(
+                        programador
+                );
         }
 
+        @Transactional
+        public ProgramadorResponse actualizarProgramador(
+                Integer id,
+                ProgramadorUpdateRequest request) {
 
-        if (request.turno() != null) {
-                programador.setTurno(request.turno());
+                Programador programador = programadorRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new NoSuchElementException(
+                                        "Programador no encontrado"
+                                ));
+
+                Trabajador trabajador = programador.getTrabajador();
+                Usuario usuario = trabajador.getUsuario();
+
+                if (request.nombres() != null) {
+                trabajador.setNombres(request.nombres());
+                }
+
+                if (request.apellidos() != null) {
+                trabajador.setApellidos(request.apellidos());
+                }
+
+                if (request.dni() != null
+                        && !trabajador.getDni().equals(request.dni())) {
+
+                if (trabajadorRepository
+                        .findByDni(request.dni())
+                        .isPresent()) {
+
+                        throw new IllegalArgumentException(
+                                "El DNI ya está registrado"
+                        );
+                }
+
+                trabajador.setDni(request.dni());
+                }
+
+                if (request.telefono() != null) {
+                trabajador.setTelefono(request.telefono());
+                }
+
+                if (request.direccion() != null) {
+                trabajador.setDireccion(request.direccion());
+                }
+
+                if (request.fechaIngreso() != null) {
+                trabajador.setFechaIngreso(
+                        request.fechaIngreso()
+                );
+                }
+                
+
+                if (request.correo() != null
+                        && !usuario.getCorreo()
+                                .equals(request.correo())) {
+
+                if (usuarioRepository
+                        .findByCorreo(request.correo())
+                        .isPresent()) {
+
+                        throw new IllegalArgumentException(
+                                "El correo ya está registrado"
+                        );
+                }
+
+                usuario.setCorreo(request.correo());
+                }
+
+
+                if (request.turno() != null) {
+                        programador.setTurno(request.turno());
+                }
+
+                if (request.nivelIngles() != null) {
+                        programador.setNivelIngles(request.nivelIngles());
+                }
+
+                usuarioRepository.save(usuario);
+                trabajadorRepository.save(trabajador);
+                programadorRepository.save(programador);
+
+                return programadorMapper.toResponse(
+                        programador
+                );
         }
 
-        if (request.nivelIngles() != null) {
-                programador.setNivelIngles(request.nivelIngles());
+        @Transactional
+        public void eliminarProgramador(Integer id) {
+
+                Programador programador = programadorRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new NoSuchElementException(
+                                        "Programador no encontrado"
+                                ));
+
+                Trabajador trabajador = programador.getTrabajador();
+
+                trabajador.setEstado(Estado.INACTIVO);
+
+                trabajadorRepository.save(trabajador);
         }
 
-        usuarioRepository.save(usuario);
-        trabajadorRepository.save(trabajador);
-        programadorRepository.save(programador);
+        public ProgramadorResponse me(String correo) {
 
-        return programadorMapper.toResponse(
-                programador
-        );
-    }
+                Usuario usuario = usuarioRepository.findByCorreo(correo)
+                        .orElseThrow(() ->
+                                new NoSuchElementException(
+                                        "Usuario no encontrado"
+                                )
+                        );
 
-    @Transactional
-    public void eliminarProgramador(Integer id) {
+                Trabajador trabajador = trabajadorRepository
+                        .findByUsuario(usuario)
+                        .orElseThrow(() ->
+                                new NoSuchElementException(
+                                        "Trabajador no encontrado"
+                                )
+                        );
 
-        Programador programador = programadorRepository
-                .findById(id)
-                .orElseThrow(() ->
-                        new NoSuchElementException(
-                                "Programador no encontrado"
-                        ));
+                Programador programador = programadorRepository
+                        .findById(trabajador.getIdTrabajador())
+                        .orElseThrow(() ->
+                                new NoSuchElementException(
+                                        "Programador no encontrado"
+                                )
+                        );
 
-        Trabajador trabajador = programador.getTrabajador();
-
-        trabajador.setEstado(Estado.INACTIVO);
-
-        trabajadorRepository.save(trabajador);
-    }
+                return programadorMapper.toResponse(programador);
+        }
 }

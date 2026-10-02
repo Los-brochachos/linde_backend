@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,71 +27,80 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TecnicoRestController {
 
-    private final TecnicoService tecnicoService;
+        private final TecnicoService tecnicoService;
 
-    @GetMapping
-    public ResponseEntity<List<TecnicoResponse>> listarTodos() {
-        return ResponseEntity.ok(
-                tecnicoService.listarTodos()
-        );
-    }
+        @GetMapping
+        public ResponseEntity<List<TecnicoResponse>> listarTodos() {
+                return ResponseEntity.ok(
+                        tecnicoService.listarTodos()
+                );
+        }
 
-    @GetMapping("/activos")
-    public ResponseEntity<List<TecnicoResponse>> listarActivos() {
-        return ResponseEntity.ok(
-                tecnicoService.listarActivos()
-        );
-    }
+        @GetMapping("/me")
+        public ResponseEntity<TecnicoResponse> me(Authentication authentication) {
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TecnicoResponse> buscarPorId(
-            @PathVariable Integer id) {
+                return ResponseEntity.ok(
+                        tecnicoService.me(authentication.getName())
+                );
+        }
 
-        return ResponseEntity.ok(
-                tecnicoService.buscarPorId(id)
-        );
-    }
+        
+        @GetMapping("/activos")
+        public ResponseEntity<List<TecnicoResponse>> listarActivos() {
+                return ResponseEntity.ok(
+                        tecnicoService.listarActivos()
+                );
+        }
 
-    @GetMapping("/{id}/activo")
-    public ResponseEntity<TecnicoResponse> buscarActivoPorId(
-            @PathVariable Integer id) {
+        @GetMapping("/{id}")
+        public ResponseEntity<TecnicoResponse> buscarPorId(
+                @PathVariable Integer id) {
 
-        return ResponseEntity.ok(
-                tecnicoService.buscarActivoPorId(id)
-        );
-    }
+                return ResponseEntity.ok(
+                        tecnicoService.buscarPorId(id)
+                );
+        }
 
-    @PostMapping
-    public ResponseEntity<TecnicoResponse> crear(
-            @Valid @RequestBody TecnicoCreateRequest request) {
+        @GetMapping("/{id}/activo")
+        public ResponseEntity<TecnicoResponse> buscarActivoPorId(
+                @PathVariable Integer id) {
 
-        TecnicoResponse response =
-                tecnicoService.crearTecnico(request);
+                return ResponseEntity.ok(
+                        tecnicoService.buscarActivoPorId(id)
+                );
+        }
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
-    }
+        @PostMapping
+        public ResponseEntity<TecnicoResponse> crear(
+                @Valid @RequestBody TecnicoCreateRequest request) {
 
-    @PutMapping("/{id}")
-    public ResponseEntity<TecnicoResponse> actualizar(
-            @PathVariable Integer id,
-            @Valid @RequestBody TecnicoUpdateRequest request) {
+                TecnicoResponse response =
+                        tecnicoService.crearTecnico(request);
 
-        return ResponseEntity.ok(
-                tecnicoService.actualizarTecnico(
-                        id,
-                        request
-                )
-        );
-    }
+                return ResponseEntity
+                        .status(HttpStatus.CREATED)
+                        .body(response);
+        }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(
-            @PathVariable Integer id) {
+        @PutMapping("/{id}")
+        public ResponseEntity<TecnicoResponse> actualizar(
+                @PathVariable Integer id,
+                @Valid @RequestBody TecnicoUpdateRequest request) {
 
-        tecnicoService.eliminarTecnico(id);
+                return ResponseEntity.ok(
+                        tecnicoService.actualizarTecnico(
+                                id,
+                                request
+                        )
+                );
+        }
 
-        return ResponseEntity.noContent().build();
-    }
+        @DeleteMapping("/{id}")
+        public ResponseEntity<Void> eliminar(
+                @PathVariable Integer id) {
+
+                tecnicoService.eliminarTecnico(id);
+
+                return ResponseEntity.noContent().build();
+        }
 }

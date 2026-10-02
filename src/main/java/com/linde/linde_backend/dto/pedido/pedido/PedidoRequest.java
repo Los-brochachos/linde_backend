@@ -18,9 +18,6 @@ public record PedidoRequest(
     @NotNull(message = "La prioridad es obligatoria")
     PrioridadPedido prioridad,
 
-    @NotNull(message = "El cliente es obligatorio")
-    Integer idCliente,
-
     @NotEmpty(message = "El pedido debe contener al menos un producto")
     @Valid
     List<DetallePedidoRequest> detalles
