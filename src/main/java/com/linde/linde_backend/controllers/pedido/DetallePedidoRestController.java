@@ -21,14 +21,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/pedidos")
+@RequestMapping("/api/v1/pedidos/{idPedido}/detalles")
 @RequiredArgsConstructor
 public class DetallePedidoRestController {
 
     private final DetallePedidoService detallePedidoService;
 
     // CLIENTE: listar detalles activos de su propio pedido
-    @GetMapping("/{idPedido}/detalles")
+    @GetMapping("")
     public ResponseEntity<List<DetallePedidoResponse>> listarActivosPorPedidoCliente(
             @PathVariable Integer idPedido,
             Authentication authentication) {
@@ -43,7 +43,7 @@ public class DetallePedidoRestController {
 
     // ADMIN / ANALISTA / PROGRAMADOR:
     // listar detalles activos de cualquier pedido
-    @GetMapping("/{idPedido}/detalles/activos")
+    @GetMapping("/activos")
     public ResponseEntity<List<DetallePedidoResponse>> listarActivosPorPedido(
             @PathVariable Integer idPedido) {
 
@@ -54,7 +54,7 @@ public class DetallePedidoRestController {
 
     // ADMIN / ANALISTA / PROGRAMADOR:
     // listar todos los detalles, incluidos los inactivos
-    @GetMapping("/{idPedido}/detalles/todos")
+    @GetMapping("/todos")
     public ResponseEntity<List<DetallePedidoResponse>> listarTodosPorPedido(
             @PathVariable Integer idPedido) {
 
@@ -64,7 +64,7 @@ public class DetallePedidoRestController {
     }
 
     // CLIENTE: agregar detalle a su propio pedido
-    @PostMapping("/{idPedido}/detalles")
+    @PostMapping("")
     public ResponseEntity<DetallePedidoResponse> agregarDetalle(
             @PathVariable Integer idPedido,
             @Valid @RequestBody DetallePedidoRequest request,
@@ -80,7 +80,7 @@ public class DetallePedidoRestController {
     }
 
     // CLIENTE: aumentar cantidad de un detalle de su propio pedido
-    @PatchMapping("/{idPedido}/detalles/{idDetalle}/cantidad")
+    @PatchMapping("/{idDetalle}/cantidad")
     public ResponseEntity<DetallePedidoResponse> agregarCantidad(
             @PathVariable Integer idPedido,
             @PathVariable Integer idDetalle,
@@ -98,7 +98,7 @@ public class DetallePedidoRestController {
     }
 
     // CLIENTE: cancelar un detalle de su propio pedido
-    @PatchMapping("/{idPedido}/detalles/{idDetalle}/cancelar")
+    @PatchMapping("/{idDetalle}/cancelar")
     public ResponseEntity<DetallePedidoResponse> cancelar(
             @PathVariable Integer idPedido,
             @PathVariable Integer idDetalle,

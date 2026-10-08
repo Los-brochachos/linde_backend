@@ -4,12 +4,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import jakarta.persistence.LockModeType;
 
 import com.linde.linde_backend.entities.usuario.Token;
 import com.linde.linde_backend.entities.usuario.Usuario;
 
-public interface TokenRepository extends JpaRepository<Token,Integer> {
+public interface TokenRepository extends JpaRepository<Token,Long> {
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<Token> findByToken(String token);
 
     Optional<List<Token>> findByUser(Usuario usuario);

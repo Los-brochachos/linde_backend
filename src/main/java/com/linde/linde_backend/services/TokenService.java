@@ -1,52 +1,66 @@
 package com.linde.linde_backend.services;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.util.HexFormat;
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
+import com.linde.linde_backend.config.JwtConfig;
 import com.linde.linde_backend.entities.usuario.Token;
-import com.linde.linde_backend.entities.usuario.Usuario;
 import com.linde.linde_backend.entities.usuario.Token.TokenType;
+import com.linde.linde_backend.entities.usuario.Usuario;
 import com.linde.linde_backend.repositories.TokenRepository;
-
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-@Service 
-@RequiredArgsConstructor 
+@Service
+@RequiredArgsConstructor
 public class TokenService {
   private final TokenRepository repository;
-  @Value ("${application.jwt.token-expiration-after-days}")
-  private Integer tokenExpirationAfterDays;
-  @Value ("${application.jwt.refresh-token-expiration-after-days}")
-  private Integer refreshTokenExpirationAfterDays;
+  private final JwtConfig jwtConfig;
 
-  public List<Token> getTokensByUser(Usuario usuario) throws Exception{
-    return repository.findByUser(usuario).orElseThrow(()->new Exception("User not found"));
+  public List<Token> getTokensByUser(Usuario usuario) {
+    return repository.findByUser(usuario).orElse(List.of());
   }
 
-  @Transactional 
-  public void saveTokens(Usuario usuario, String jwtToken, String refreshToken) {
-    try {
-      
-    Token jwtTokenObj = Token.builder()
-        .user(usuario)
-        .token(jwtToken)
-        .expirationDate(LocalDateTime.now().plusDays(tokenExpirationAfterDays))
-        .type(TokenType.TOKEN)
-        .build();
-    Token refreshTokenObj = Token.builder()
-        .user(usuario)
-        .token(jwtToken)
-        .expirationDate(LocalDateTime.now().plusDays(refreshTokenExpirationAfterDays))
+  @Transactional
+  public void saveRefreshToken(Usuario usuario, String refreshToken) {
+    repository.save(Token.builder().user(usuario).token(hash(refreshToken))
         .type(TokenType.REFRESH_TOKEN)
-        .build();
-    repository.save(jwtTokenObj);
-    repository.save(refreshTokenObj);
-    } catch (Exception e) {
-      throw new RuntimeException("Error saving tokens");
+        .expirationDate(LocalDateTime.now().plusDays(jwtConfig.getRefreshTokenExpirationAfterDays())).build());
+  }
+
+  /** El bloqueo y la transaccion de AuthService evitan consumir el mismo refresh dos veces. */
+  @Transactional
+  public Usuario consumeRefreshToken(String refreshToken) {
+    Token stored = repository.findByToken(hash(refreshToken))
+        .orElseThrow(() -> new BadCredentialsException("Sesion invalida"));
+    if (stored.getType() != TokenType.REFRESH_TOKEN || stored.getUser() == null
+        || !stored.getExpirationDate().isAfter(LocalDateTime.now()) || !stored.getUser().isEnabled()) {
+      throw new BadCredentialsException("Sesion invalida");
+    }
+    Usuario user = stored.getUser();
+    repository.delete(stored);
+    return user;
+  }
+
+  @Transactional
+  public void revokeRefreshToken(String refreshToken) {
+    if (refreshToken != null && !refreshToken.isBlank()) {
+      repository.findByToken(hash(refreshToken)).ifPresent(repository::delete);
+    }
+  }
+
+  static String hash(String token) {
+    if (token == null || token.isBlank()) throw new BadCredentialsException("Sesion invalida");
+    try {
+      return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
+          .digest(token.getBytes(StandardCharsets.UTF_8)));
+    } catch (NoSuchAlgorithmException ex) {
+      throw new IllegalStateException(ex);
     }
   }
 }

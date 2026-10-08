@@ -4,6 +4,8 @@ import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
@@ -28,6 +30,10 @@ import lombok.RequiredArgsConstructor;
  
 public class SecurityConfig {
     private final JwtAuthFilter filter;
+    @Value("${application.auth.cookie-secure:true}")
+    private boolean cookieSecure;
+    @Value("${application.auth.allowed-origins:http://127.0.0.1:3000,http://localhost:4200,http://localhost:5173}")
+    private String allowedOrigins;
 
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -37,13 +43,26 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(csrfTokenRepository())
+                .requireCsrfProtectionMatcher(request ->
+                    request.getRequestURI().substring(request.getContextPath().length()).startsWith("/auth/")
+                    && !Arrays.asList("GET", "HEAD", "OPTIONS", "TRACE").contains(request.getMethod())))
             .cors(Customizer.withDefaults())
+            .logout(logout -> logout.disable())
+            .exceptionHandling(errors -> errors
+                .authenticationEntryPoint((request, response, exception) -> {
+                    response.setStatus(401);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"message\":\"Autenticacion requerida\"}");
+                }))
             .authorizeHttpRequests(auth -> auth
 
                 //ENDPOINTS PUBLICOS - AUTENTICACIÓN
                 .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/refresh-token").permitAll()
+                .requestMatchers(HttpMethod.GET, "/auth/csrf").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/logout").permitAll()
                 .requestMatchers("/prueba/**").permitAll()
 
 
@@ -492,6 +511,14 @@ public class SecurityConfig {
     }
 
     @Bean
+    CookieCsrfTokenRepository csrfTokenRepository() {
+        CookieCsrfTokenRepository repository = new CookieCsrfTokenRepository();
+        repository.setCookiePath("/auth");
+        repository.setCookieCustomizer(cookie -> cookie.httpOnly(true).secure(cookieSecure).sameSite("Strict"));
+        return repository;
+    }
+
+    @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -499,8 +526,8 @@ public class SecurityConfig {
     @Bean
     UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:3000","http://localhost:4200","http://localhost:5173"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedOrigins(Arrays.stream(allowedOrigins.split(",")).map(origin -> origin.trim()).toList());
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

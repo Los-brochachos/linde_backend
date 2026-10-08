@@ -18,7 +18,7 @@ public interface TecnicoRepository extends JpaRepository<Tecnico, Integer> {
             Estado estado
     );
 
-    Optional<Tecnico> findByUsuario(Usuario usuario);
+    Optional<Tecnico> findByTrabajadorUsuario(Usuario usuario);
 
     
 }

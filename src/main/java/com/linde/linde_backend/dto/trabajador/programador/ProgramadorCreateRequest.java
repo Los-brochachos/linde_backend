@@ -20,9 +20,9 @@ public record ProgramadorCreateRequest(
 
     @NotBlank(message = "La contraseña es obligatoria")
     @Size(
-        min = 6,
+        min = 8,
         max = 100,
-        message = "La contraseña debe tener entre 6 y 100 caracteres"
+        message = "La contraseña debe tener entre 8 y 100 caracteres"
     )
     String contraseña,
 

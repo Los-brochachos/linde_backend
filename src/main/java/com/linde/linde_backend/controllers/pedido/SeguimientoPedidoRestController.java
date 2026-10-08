@@ -16,13 +16,13 @@ import lombok.RequiredArgsConstructor;
 
 
 @RestController
-@RequestMapping("/api/v1/pedidos")
+@RequestMapping("/api/v1/pedidos/{idPedido}/seguimiento")
 @RequiredArgsConstructor
 public class SeguimientoPedidoRestController {
 
     private final SeguimientoPedidoService seguimientoPedidoService;
 
-    @GetMapping("/{idPedido}/seguimiento")
+    @GetMapping("")
     public ResponseEntity<List<SeguimientoPedidoResponse>> listarPorPedidoCliente(
             Authentication authentication,
             @PathVariable Integer idPedido) {
@@ -33,7 +33,7 @@ public class SeguimientoPedidoRestController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{idPedido}/seguimiento/todos")
+    @GetMapping("/todos")
     public ResponseEntity<List<SeguimientoPedidoResponse>> listarPorPedido(
             @PathVariable Integer idPedido) {
 

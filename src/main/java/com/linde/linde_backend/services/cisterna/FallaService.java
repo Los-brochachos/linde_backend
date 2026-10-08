@@ -64,7 +64,7 @@ public class FallaService {
                                 "Usuario no encontrado"));
 
         Tecnico tecnico = tecnicoRepository
-                .findByUsuario(usuario)
+                .findByTrabajadorUsuario(usuario)
                 .orElseThrow(() ->
                         new NoSuchElementException(
                                 "Técnico no encontrado"));
