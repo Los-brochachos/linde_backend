@@ -8,4 +8,5 @@ import com.linde.linde_backend.entities.usuario.Usuario;
 
 public interface UsuarioRepository extends JpaRepository<Usuario,Integer>{
     Optional<Usuario> findByCorreo(String correo);  
+    
 }

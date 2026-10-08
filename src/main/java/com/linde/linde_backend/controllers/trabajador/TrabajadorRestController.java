@@ -2,15 +2,20 @@ package com.linde.linde_backend.controllers.trabajador;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.linde.linde_backend.dto.trabajador.TrabajadorCreateRequest;
 import com.linde.linde_backend.dto.trabajador.TrabajadorResponse;
 import com.linde.linde_backend.services.trabajador.TrabajadorService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -70,5 +75,14 @@ public class TrabajadorRestController {
         return ResponseEntity.ok(
                 trabajadorService.buscarActivoPorDni(dni)
         );
+    }
+
+    @PostMapping
+    public ResponseEntity<TrabajadorResponse> crear(
+        @Valid @RequestBody TrabajadorCreateRequest request) {
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(trabajadorService.crear(request));
     }
 }

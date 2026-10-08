@@ -200,6 +200,9 @@ public class SecurityConfig {
                 // =========================================================
                 // TRABAJADORES
 
+                .requestMatchers(HttpMethod.POST, "/api/v1/trabajadores")
+                    .hasRole("ADMIN")
+
                 .requestMatchers(HttpMethod.GET, "/api/v1/trabajadores")
                     .hasAnyRole("ADMIN", "ANALISTA")
 
