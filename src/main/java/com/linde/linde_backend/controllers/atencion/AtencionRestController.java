@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.linde.linde_backend.dto.atencion.atencion.AtencionRequest;
+import com.linde.linde_backend.dto.atencion.atencion.EditarAtencionRequest;
 import com.linde.linde_backend.dto.atencion.atencion.AtencionResponse;
 import com.linde.linde_backend.dto.atencion.atencion.CancelarAtencionRequest;
 import com.linde.linde_backend.services.atencion.AtencionService;
@@ -28,6 +29,22 @@ import lombok.RequiredArgsConstructor;
 public class AtencionRestController {
 
     private final AtencionService service;
+
+    @GetMapping("/asignadas")
+    public ResponseEntity<List<AtencionResponse>> asignadas(org.springframework.security.core.Authentication authentication) {
+        return ResponseEntity.ok(service.listarAsignadas(authentication.getName()));
+    }
+
+    @GetMapping("/asignadas/{id}")
+    public ResponseEntity<AtencionResponse> asignada(@PathVariable Integer id, org.springframework.security.core.Authentication authentication) {
+        return ResponseEntity.ok(service.buscarAsignada(id, authentication.getName()));
+    }
+
+    @GetMapping("/mis-atenciones")
+    public ResponseEntity<List<AtencionResponse>> misAtenciones(
+            org.springframework.security.core.Authentication authentication) {
+        return ResponseEntity.ok(service.listarMisAtenciones(authentication.getName()));
+    }
 
     @GetMapping
     public ResponseEntity<List<AtencionResponse>> listar() {
@@ -78,19 +95,25 @@ public class AtencionRestController {
 
     @PatchMapping("/{id}/iniciar")
     public ResponseEntity<AtencionResponse> iniciar(
-            @PathVariable Integer id) {
+            @PathVariable Integer id, org.springframework.security.core.Authentication authentication) {
 
         return ResponseEntity.ok(
-                service.iniciar(id)
+                service.iniciar(id, authentication.getName())
         );
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<AtencionResponse> editar(@PathVariable Integer id,
+            @Valid @RequestBody EditarAtencionRequest request) {
+        return ResponseEntity.ok(service.editar(id, request));
     }
 
     @PatchMapping("/{id}/finalizar")
     public ResponseEntity<AtencionResponse> finalizar(
-            @PathVariable Integer id) {
+            @PathVariable Integer id, org.springframework.security.core.Authentication authentication) {
 
         return ResponseEntity.ok(
-                service.finalizar(id)
+                service.finalizar(id, authentication.getName())
         );
     }
 

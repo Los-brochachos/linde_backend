@@ -450,17 +450,22 @@ public class SecurityConfig {
 
                 // =========================================================
                 // ATENCION
+                .requestMatchers(HttpMethod.GET, "/api/v1/atenciones/asignadas", "/api/v1/atenciones/asignadas/*")
+                    .hasRole("CONDUCTOR")
+                .requestMatchers(HttpMethod.GET, "/api/v1/atenciones/mis-atenciones")
+                    .hasRole("CLIENTE")
+
                 .requestMatchers(HttpMethod.GET, "/api/v1/atenciones")
-                    .hasAnyRole("ADMIN", "ANALISTA", "PROGRAMADOR", "CONDUCTOR", "TECNICO")
+                    .hasAnyRole("ADMIN", "ANALISTA", "PROGRAMADOR", "TECNICO")
 
                 .requestMatchers(HttpMethod.GET, "/api/v1/atenciones/estado")
-                    .hasAnyRole("ADMIN", "ANALISTA", "PROGRAMADOR", "CONDUCTOR")
+                    .hasAnyRole("ADMIN", "ANALISTA", "PROGRAMADOR")
 
                 .requestMatchers(HttpMethod.GET, "/api/v1/atenciones/pedido/*")
-                    .hasAnyRole("ADMIN", "ANALISTA", "PROGRAMADOR", "CONDUCTOR")
+                    .hasAnyRole("ADMIN", "ANALISTA", "PROGRAMADOR")
 
                 .requestMatchers(HttpMethod.GET, "/api/v1/atenciones/*")
-                    .hasAnyRole("ADMIN", "ANALISTA", "PROGRAMADOR", "CONDUCTOR")
+                    .hasAnyRole("ADMIN", "ANALISTA", "PROGRAMADOR")
 
                 .requestMatchers(HttpMethod.POST, "/api/v1/atenciones")
                     .hasRole("PROGRAMADOR")
@@ -472,6 +477,8 @@ public class SecurityConfig {
                     .hasRole("CONDUCTOR")
 
                 .requestMatchers(HttpMethod.PATCH, "/api/v1/atenciones/*/cancelar")
+                    .hasRole("PROGRAMADOR")
+                .requestMatchers(HttpMethod.PATCH, "/api/v1/atenciones/*")
                     .hasRole("PROGRAMADOR")
                 // =========================================================
 

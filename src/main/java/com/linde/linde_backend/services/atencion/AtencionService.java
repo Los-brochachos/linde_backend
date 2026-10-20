@@ -7,6 +7,7 @@ import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 
 import com.linde.linde_backend.dto.atencion.atencion.AtencionRequest;
+import com.linde.linde_backend.dto.atencion.atencion.EditarAtencionRequest;
 import com.linde.linde_backend.dto.atencion.atencion.AtencionResponse;
 import com.linde.linde_backend.dto.atencion.atencion.CancelarAtencionRequest;
 import com.linde.linde_backend.entities.atencion.Atencion;
@@ -22,6 +23,7 @@ import com.linde.linde_backend.repositories.trabajador.ConductorRepository;
 import com.linde.linde_backend.repositories.trabajador.ProgramadorRepository;
 import com.linde.linde_backend.utils.Estado;
 import com.linde.linde_backend.utils.atencion.EstadoAtencion;
+import com.linde.linde_backend.utils.pedido.EstadoPedido;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,28 @@ public class AtencionService {
         private final CisternaRepository cisternaRepository;
         private final ProgramadorRepository programadorRepository;
         private final AtencionMapper mapper;
+
+        @org.springframework.transaction.annotation.Transactional(readOnly = true)
+        public List<AtencionResponse> listarAsignadas(String correo) {
+                return repository.findByConductor_Trabajador_Usuario_Correo(correo)
+                        .stream().map(mapper::toDto).toList();
+        }
+
+        @org.springframework.transaction.annotation.Transactional(readOnly = true)
+        public AtencionResponse buscarAsignada(Integer id, String correo) {
+                return mapper.toDto(asignada(id, correo));
+        }
+
+        private Atencion asignada(Integer id, String correo) {
+                return repository.findByIdAtencionAndConductor_Trabajador_Usuario_Correo(id, correo)
+                        .orElseThrow(() -> new NoSuchElementException("La atención no existe o no está asignada a tu cuenta"));
+        }
+
+        @org.springframework.transaction.annotation.Transactional(readOnly = true)
+        public List<AtencionResponse> listarMisAtenciones(String correo) {
+                return repository.findByPedido_Cliente_Usuario_Correo(correo)
+                        .stream().map(mapper::toDto).toList();
+        }
 
         public List<AtencionResponse> listar() {
 
@@ -93,6 +117,15 @@ public class AtencionService {
                         .orElseThrow(() ->
                                 new NoSuchElementException("El pedido no existe"));
 
+                if (pedido.getEstado() != EstadoPedido.RECIBIDO
+                        && pedido.getEstado() != EstadoPedido.EN_PREPARACION) {
+                        throw new IllegalArgumentException("Solo se pueden programar pedidos pendientes");
+                }
+                if (repository.findByPedidoIdPedido(pedido.getIdPedido()).stream()
+                        .anyMatch(this::estaActiva)) {
+                        throw new IllegalArgumentException("El pedido ya tiene una atención activa");
+                }
+
                 Conductor conductor = conductorRepository
                         .findById(request.idConductor())
                         .orElseThrow(() ->
@@ -111,10 +144,19 @@ public class AtencionService {
                         throw new IllegalArgumentException("La cisterna no está activa");
                 }
 
-                if (request.fechaFinProgramada().isBefore(request.fechaInicioProgramada())) {
+                if (!request.fechaFinProgramada().isAfter(request.fechaInicioProgramada())) {
                         throw new IllegalArgumentException(
                         "La fecha de fin programada no puede ser anterior "
                         + "a la fecha de inicio programada");
+                }
+
+                if (repository.findByCisterna_IdCisterna(request.idCisterna()).stream()
+                        .anyMatch(a -> seCruza(a, request))) {
+                        throw new IllegalArgumentException("La cisterna no está disponible en ese horario");
+                }
+                if (repository.findByConductor_IdTrabajador(request.idConductor()).stream()
+                        .anyMatch(a -> seCruza(a, request))) {
+                        throw new IllegalArgumentException("El conductor no está disponible en ese horario");
                 }
 
                 Atencion atencion = mapper.toEntity(request);
@@ -130,18 +172,67 @@ public class AtencionService {
                 return mapper.toDto(guardada);
         }
 
-        @Transactional
-        public AtencionResponse iniciar(Integer id) {
+        private boolean estaActiva(Atencion atencion) {
+                return atencion.getEstado() == EstadoAtencion.PROGRAMADA
+                        || atencion.getEstado() == EstadoAtencion.EN_CURSO;
+        }
 
+        @Transactional
+        public AtencionResponse editar(Integer id, EditarAtencionRequest request) {
                 Atencion atencion = repository.findById(id)
                         .orElseThrow(() -> new NoSuchElementException("La atención no existe"));
+                if (atencion.getEstado() != EstadoAtencion.PROGRAMADA) {
+                        throw new IllegalArgumentException("Solo se puede editar una atención PROGRAMADA");
+                }
+                if (!request.fechaFinProgramada().isAfter(request.fechaInicioProgramada())) {
+                        throw new IllegalArgumentException("La hora de fin debe ser posterior a la hora de inicio");
+                }
+                Conductor conductor = conductorRepository.findById(request.idConductor())
+                        .orElseThrow(() -> new NoSuchElementException("El conductor no existe"));
+                Cisterna cisterna = cisternaRepository.findById(request.idCisterna())
+                        .orElseThrow(() -> new NoSuchElementException("La cisterna no existe"));
+                if (conductor.getTrabajador().getEstado() != Estado.ACTIVO) {
+                        throw new IllegalArgumentException("El conductor no está activo");
+                }
+                if (cisterna.getEstado() != Estado.ACTIVO) {
+                        throw new IllegalArgumentException("La cisterna no está activa");
+                }
+                AtencionRequest intervalo = new AtencionRequest(atencion.getPedido().getIdPedido(),
+                        request.idConductor(), request.idCisterna(), request.fechaInicioProgramada(),
+                        request.fechaFinProgramada(), request.observaciones());
+                if (repository.findByCisterna_IdCisterna(request.idCisterna()).stream()
+                        .anyMatch(a -> !id.equals(a.getIdAtencion()) && seCruza(a, intervalo))) {
+                        throw new IllegalArgumentException("La cisterna no está disponible en ese horario");
+                }
+                if (repository.findByConductor_IdTrabajador(request.idConductor()).stream()
+                        .anyMatch(a -> !id.equals(a.getIdAtencion()) && seCruza(a, intervalo))) {
+                        throw new IllegalArgumentException("El conductor no está disponible en ese horario");
+                }
+                atencion.setConductor(conductor);
+                atencion.setCisterna(cisterna);
+                atencion.setFechaInicioProgramada(request.fechaInicioProgramada());
+                atencion.setFechaFinProgramada(request.fechaFinProgramada());
+                atencion.setObservaciones(request.observaciones());
+                return mapper.toDto(repository.save(atencion));
+        }
+
+        private boolean seCruza(Atencion atencion, AtencionRequest request) {
+                return estaActiva(atencion) && (atencion.getFechaFinProgramada() == null
+                        || (atencion.getFechaInicioProgramada().isBefore(request.fechaFinProgramada())
+                        && atencion.getFechaFinProgramada().isAfter(request.fechaInicioProgramada())));
+        }
+
+        @Transactional
+        public AtencionResponse iniciar(Integer id, String correo) {
+
+                Atencion atencion = asignada(id, correo);
 
                 if (atencion.getEstado() != EstadoAtencion.PROGRAMADA) {
                         throw new IllegalArgumentException("Solo se puede iniciar una atención PROGRAMADA");
                 }
 
                 atencion.setEstado(EstadoAtencion.EN_CURSO);
-                atencion.setFechaInicio(LocalDateTime.now());
+                atencion.setFechaInicio(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MICROS));
 
                 Atencion actualizada = repository.save(atencion);
 
@@ -149,12 +240,9 @@ public class AtencionService {
         }
 
         @Transactional
-        public AtencionResponse finalizar(Integer id) {
+        public AtencionResponse finalizar(Integer id, String correo) {
 
-        Atencion atencion = repository.findById(id)
-                .orElseThrow(() ->
-                        new NoSuchElementException(
-                                "La atención no existe"));
+        Atencion atencion = asignada(id, correo);
 
         if (atencion.getEstado()
                 != EstadoAtencion.EN_CURSO) {
@@ -164,7 +252,7 @@ public class AtencionService {
         }
 
         atencion.setEstado(EstadoAtencion.FINALIZADA);
-        atencion.setFechaFin(LocalDateTime.now());
+        atencion.setFechaFin(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MICROS));
 
         Atencion actualizada = repository.save(atencion);
 

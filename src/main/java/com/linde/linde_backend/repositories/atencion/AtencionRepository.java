@@ -10,6 +10,12 @@ import com.linde.linde_backend.utils.atencion.EstadoAtencion;
 
 public interface AtencionRepository extends JpaRepository<Atencion, Integer> {
 
+    List<Atencion> findByConductor_Trabajador_Usuario_Correo(String correo);
+
+    Optional<Atencion> findByIdAtencionAndConductor_Trabajador_Usuario_Correo(Integer id, String correo);
+
+    List<Atencion> findByPedido_Cliente_Usuario_Correo(String correo);
+
     List<Atencion> findByEstado(EstadoAtencion estado);
 
     List<Atencion> findByPedidoIdPedido(Integer idPedido);
