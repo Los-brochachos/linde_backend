@@ -94,3 +94,25 @@ seguimiento. La persistencia mediante dirty checking requiere integracion.
 
 Los casos de pertenencia prueban la comprobacion realizada por el servicio;
 no comprueban permisos HTTP o roles de Spring Security. No se midio cobertura.
+
+## Actualizacion: correccion verificada el 18 de octubre de 2026
+
+Los resultados anteriores son historicos. Se reprodujo PD01 con el fallo
+`expected: <ACTIVO> but was: <null>`. Se corrigio PedidoService.insertar para
+asignar `detalle.setEstado(Estado.ACTIVO)` antes de guardar cada detalle.
+La asercion original se conserva sin cambios.
+
+Se ejecuto con JAVA_HOME apuntando al JDK 25.0.4 instalado:
+
+```powershell
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-25.0.4"
+.\mvnw.cmd -o clean test "-Dtest=PedidoServiceTest,SeguimientoPedidoServiceTest,ProductoServiceTest,FallaServiceTest"
+```
+
+La recompilacion limpia tambien resolvio un VerifyError del bytecode generado
+que aparecio en el intento incremental.
+
+Resultado actual: PedidoService 17/17, SeguimientoPedidoService 7/7,
+ProductoService 11/11 y FallaService 11/11. Total: 46 pruebas, 0 fallos,
+0 errores, 0 omitidas. BUILD SUCCESS; tiempo total 12.104 segundos.
+Evidencias actuales: `evidencias/correccion-pedido-2026-10-18/`.

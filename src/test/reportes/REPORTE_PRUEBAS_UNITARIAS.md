@@ -1,6 +1,6 @@
 # Reporte de pruebas unitarias
 
-Proyecto: Linde Backend. Fecha de ejecucion: 4 de octubre de 2026.
+Proyecto: Linde Backend. Fecha de ejecucion: 18 de octubre de 2026.
 
 ## Objetivo y componentes seleccionados
 
@@ -26,7 +26,7 @@ habilita los repositorios simulados declarados con `@Mock`.
 Los servicios y los mappers se ejecutan realmente; los repositorios se simulan.
 Se comprueban respuestas, cambios de estado, excepciones y llamadas de guardado.
 Estas son pruebas unitarias: no necesitan MySQL, servidor HTTP, perfil `dev`
-ni carga de datos. No se usa `@SpringBootTest` porque cargaria el contexto completo;
+ni carga de datos. No se usa `@SpringBootTest` porque cargaria el contexto completo
 el proyecto ya tiene una prueba de contexto independiente.
 
 Cada prueba sigue Arrange-Act-Assert: preparar entradas y respuestas simuladas,
@@ -70,6 +70,7 @@ otra capa; llamar directamente al servicio no ejecuta automaticamente `@Valid`.
 Desde la raiz del backend, en PowerShell:
 
 ```powershell
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-25.0.4"
 .\mvnw.cmd -o test "-Dtest=ProductoServiceTest,FallaServiceTest"
 ```
 
@@ -88,8 +89,8 @@ Total:          Tests run: 22, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
-Maven registro un tiempo total de 3.131 segundos. Las clases de fallas y productos
-tardaron 0.887 y 0.094 segundos respectivamente. Estos tiempos pueden variar.
+Maven registro un tiempo total de 9.458 segundos. Las clases de fallas y productos
+tardaron 1.137 y 0.099 segundos respectivamente. Estos tiempos pueden variar.
 Las advertencias de instrumentacion de Mockito y Lombok no causaron fallos.
 
 Se conservan copias de los reportes de esta ejecucion en `evidencias/`, junto a
@@ -119,3 +120,17 @@ los servicios. No se calculo un porcentaje de cobertura.
 | Evidencias registradas | Tabla de resultados y reportes Surefire conservados | 3 |
 
 La puntuacion final corresponde a la evaluacion del docente.
+
+## Incidencias de la ejecucion actual
+
+- La primera ejecucion no llego a ejecutar pruebas: Maven utilizaba Java 17 y
+  el proyecto requiere Java 25 (`release version 25 not supported`). Se resolvio
+  seleccionando el JDK 25.0.4 instalado mediante JAVA_HOME, solo para la sesion.
+- Con Java 25, Surefire registro 22 pruebas aprobadas y BUILD SUCCESS. No se
+  detectaron defectos en los escenarios seleccionados. Las advertencias de
+  Lombok, Mockito y carga dinamica del agente no impidieron las pruebas.
+- PowerShell representa algunas advertencias de stderr como NativeCommandError;
+  el resultado de pruebas se verifica en los XML/TXT de Surefire y BUILD SUCCESS.
+- Se reutilizaron las 22 pruebas existentes y se volvieron a ejecutar; no se
+  afirma que hayan sido creadas en esta revision ni que se haya aplicado TDD.
+- Log completo: evidencias/ejecucion-unitarias-2026-10-18.log.

@@ -112,6 +112,7 @@ public class PedidoService {
                         producto
                 );
 
+                detalle.setEstado(Estado.ACTIVO);
                 detallePedidoRepository.save(detalle);
                 }
 
