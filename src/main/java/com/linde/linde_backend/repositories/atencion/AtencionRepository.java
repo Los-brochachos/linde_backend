@@ -9,6 +9,7 @@ import com.linde.linde_backend.entities.atencion.Atencion;
 import com.linde.linde_backend.utils.atencion.EstadoAtencion;
 
 public interface AtencionRepository extends JpaRepository<Atencion, Integer> {
+    boolean existsByConductor_IdTrabajadorAndEstado(Integer idConductor, EstadoAtencion estado);
 
     List<Atencion> findByConductor_Trabajador_Usuario_Correo(String correo);
 

@@ -8,6 +8,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.linde.linde_backend.entities.pedido.Pedido;
 
 public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
+
+    @Override
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = "cliente")
+    List<Pedido> findAll();
     
     List<Pedido> findByClienteIdCliente(Integer idCliente);
 

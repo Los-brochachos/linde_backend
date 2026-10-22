@@ -29,7 +29,8 @@ public class PedidoMapper {
                 pedido.getEstado(),
                 pedido.getFechaEntregaEstimada(),
                 pedido.getPrioridad(),
-                pedido.getCliente().getIdCliente()
+                pedido.getCliente().getIdCliente(),
+                pedido.getCliente().getRazonSocial()
         );
     }
 }

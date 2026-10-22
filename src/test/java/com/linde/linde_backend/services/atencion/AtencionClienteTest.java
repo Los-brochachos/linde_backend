@@ -17,7 +17,7 @@ class AtencionClienteTest {
             .pedido(Pedido.builder().idPedido(3).build()).build();
         when(repository.findByPedido_Cliente_Usuario_Correo("cliente@linde.example"))
             .thenReturn(List.of(atencion));
-        var service = new AtencionService(repository, null, null, null, null, new AtencionMapper());
+        var service = new AtencionService(repository, null, null, null, null, new AtencionMapper(), null);
         var resultado = service.listarMisAtenciones("cliente@linde.example");
         assertEquals(1, resultado.size());
         assertEquals(7, resultado.getFirst().idAtencion());
@@ -29,7 +29,7 @@ class AtencionClienteTest {
     @Test void clienteSinAtencionesRecibeListaVacia() {
         var repository = mock(AtencionRepository.class);
         when(repository.findByPedido_Cliente_Usuario_Correo("otro@linde.example")).thenReturn(List.of());
-        var service = new AtencionService(repository, null, null, null, null, new AtencionMapper());
+        var service = new AtencionService(repository, null, null, null, null, new AtencionMapper(), null);
         assertTrue(service.listarMisAtenciones("otro@linde.example").isEmpty());
         verify(repository, never()).findAll();
     }

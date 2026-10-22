@@ -26,6 +26,9 @@ public record AtencionResponse(
 
         Integer idCisterna,
 
-        Integer idProgramador
+        Integer idProgramador,
+        String razonSocial,
+        String nombreConductor,
+        String cisterna
 
 ) {}

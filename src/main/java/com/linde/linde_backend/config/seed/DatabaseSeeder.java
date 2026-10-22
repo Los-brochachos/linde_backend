@@ -85,25 +85,33 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .direccion("Av. Industrial " + (100 + i) + ", Lima").telefono("91000000" + (i + 1))
                 .usuario(usuario("cliente" + (i + 1), RolesEnum.CLIENTE, password)).build()));
             cisternas.add(guardar(Cisterna.builder().nombre("Cisterna Demo " + (i + 1)).placa("DEM-10" + i)
-                .capacidad(new BigDecimal("20000.00")).estado(i == 4 ? Estado.INACTIVO : Estado.ACTIVO).build()));
+                .capacidad(new BigDecimal("20000.00")).estado(Estado.ACTIVO).build()));
             productos.add(guardar(Producto.builder().nombre(gases[i]).tipoGas(gases[i]).unidadMedida("m3")
                 .precioUnitario(new BigDecimal(precios[i])).estado(Estado.ACTIVO).build()));
         }
-        // Tres pedidos por estado, con historial cronologico y ultimo estado consistente.
-        for (int i = 0; i < 15; i++) {
+        Cisterna enMantenimiento = guardar(Cisterna.builder().nombre("Cisterna Demo Mantenimiento")
+            .placa("DEM-105").capacidad(new BigDecimal("20000.00")).estado(Estado.INACTIVO).build());
+        // Cinco escenarios por cliente, con recursos distintos y sin cruces activos.
+        for (int i = 0; i < clientes.size() * 5; i++) {
+            int cliente = i / 5;
             EstadoPedido estado = EstadoPedido.values()[i % 5];
-            LocalDateTime registro = hoy.minusDays(20 - i).atTime(8, 0);
-            LocalDateTime traslado = estado == EstadoPedido.EN_PREPARACION ? hoy.plusDays(1 + i / 5).atTime(9, 0)
-                : estado == EstadoPedido.DESPACHADO ? ahora.minusHours(1) : registro.plusDays(2).withHour(9);
-            Pedido pedido = guardar(Pedido.builder().cliente(clientes.get(i % 5)).fechaRegistro(registro.toLocalDate())
+            LocalDateTime registro = hoy.minusDays(12 + cliente).atTime(8, 0);
+            LocalDateTime traslado = estado == EstadoPedido.EN_PREPARACION ? hoy.plusDays(1 + cliente).atTime(9, 0)
+                : estado == EstadoPedido.DESPACHADO ? ahora.minusHours(1)
+                : estado == EstadoPedido.ENTREGADO ? hoy.minusDays(2 + cliente).atTime(9, 0)
+                : hoy.plusDays(3 + cliente).atTime(9, 0);
+            Pedido pedido = guardar(Pedido.builder().cliente(clientes.get(cliente)).fechaRegistro(registro.toLocalDate())
                 .fechaEntregaEstimada(traslado.toLocalDate()).prioridad(PrioridadPedido.values()[i % 3]).estado(estado).build());
             Producto producto = productos.get(i % 5);
             DetallePedido detalle = guardar(DetallePedido.builder().pedido(pedido).producto(producto)
                 .cantidad(new BigDecimal("1500.00")).precioUnitario(producto.getPrecioUnitario())
-                .estado(estado == EstadoPedido.CANCELADO ? Estado.INACTIVO : Estado.ACTIVO).build());
+                .estado(Estado.ACTIVO).build());
             pedido.setDetalles(List.of(detalle));
             seguimiento(pedido, EstadoPedido.RECIBIDO, registro);
             if (estado == EstadoPedido.CANCELADO) {
+                seguimiento(pedido, EstadoPedido.EN_PREPARACION, registro.plusHours(1));
+                visitaCancelada(pedido, conductores.get(cliente), programadores.get(cliente),
+                    cisternas.get(cliente), registro.plusDays(2));
                 seguimiento(pedido, estado, registro.plusHours(2));
             } else {
                 List<EstadoPedido> flujo = List.of(EstadoPedido.RECIBIDO, EstadoPedido.EN_PREPARACION,
@@ -115,21 +123,28 @@ public class DatabaseSeeder implements CommandLineRunner {
                     }
                 }
             }
+            if (estado == EstadoPedido.EN_PREPARACION) {
+                visitaCancelada(pedido, conductores.get(cliente), programadores.get(cliente),
+                    cisternas.get(cliente), registro.plusDays(2));
+                seguimiento(pedido, EstadoPedido.RECIBIDO, registro.plusHours(3));
+                seguimiento(pedido, EstadoPedido.EN_PREPARACION, registro.plusHours(4));
+            }
             if (estado == EstadoPedido.EN_PREPARACION || estado == EstadoPedido.DESPACHADO || estado == EstadoPedido.ENTREGADO) {
                 EstadoAtencion ea = estado == EstadoPedido.ENTREGADO ? EstadoAtencion.FINALIZADA
                     : estado == EstadoPedido.DESPACHADO ? EstadoAtencion.EN_CURSO : EstadoAtencion.PROGRAMADA;
-                Atencion atencion = guardar(Atencion.builder().pedido(pedido).conductor(conductores.get(i % conductores.size()))
-                    .programador(programadores.get(i % programadores.size())).cisterna(cisternas.get(i % 4))
+                Atencion atencion = guardar(Atencion.builder().pedido(pedido).conductor(conductores.get(cliente))
+                    .programador(programadores.get(cliente)).cisterna(cisternas.get(cliente))
                     .fechaInicioProgramada(traslado).fechaFinProgramada(traslado.plusHours(3))
                     .fechaInicio(ea == EstadoAtencion.PROGRAMADA ? null : traslado)
                     .fechaFin(ea == EstadoAtencion.FINALIZADA ? traslado.plusHours(3) : null)
                     .estado(ea).observaciones("Entrega de demostracion").build());
-                guardar(Alerta.builder().atencion(atencion).tipo(TipoAlerta.RETRASO)
+                if (ea != EstadoAtencion.PROGRAMADA) guardar(Alerta.builder().atencion(atencion).tipo(TipoAlerta.RETRASO)
                     .mensaje("Demora reportada en ruta de demostracion")
                     .fechaHora(ea == EstadoAtencion.PROGRAMADA ? ahora : traslado.plusMinutes(15))
                     .estado(ea == EstadoAtencion.FINALIZADA ? EstadoAlerta.ATENDIDA : EstadoAlerta.PENDIENTE).build());
             }
-            if (estado == EstadoPedido.DESPACHADO || estado == EstadoPedido.ENTREGADO) {
+            // RF05: documentos solo despues de finalizar la entrega.
+            if (estado == EstadoPedido.ENTREGADO) {
                 guardar(Factura.builder().pedido(pedido).numero("FDEM-" + String.format("%08d", i + 1))
                     .fechaEmision(traslado.toLocalDate()).tipoComprobante("FACTURA").moneda("PEN").build());
                 guardar(GuiaRemision.builder().pedido(pedido).numero("TDEM-" + String.format("%08d", i + 1))
@@ -140,7 +155,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         }
         // Ocho fallas: tres pendientes y cinco con historial de mantenimiento.
         for (int i = 0; i < 8; i++) {
-            Falla falla = guardar(Falla.builder().cisterna(cisternas.get(4)).tecnico(tecnicos.get(i % tecnicos.size()))
+            Falla falla = guardar(Falla.builder().cisterna(enMantenimiento).tecnico(tecnicos.get(i % tecnicos.size()))
                 .descripcion("Revision de componente de prueba " + (i + 1)).fechaHora(ahora.minusDays(10 - i))
                 .estado(EstadoFalla.values()[i % EstadoFalla.values().length]).build());
             if (falla.getEstado() != EstadoFalla.PENDIENTE) {
@@ -153,6 +168,14 @@ public class DatabaseSeeder implements CommandLineRunner {
         entityManager.flush();
         log.info("Seeder de desarrollo: datos insertados en las 17 tablas de negocio.");
         // Los tokens se generan mediante el login real.
+    }
+
+    private void visitaCancelada(Pedido pedido, Conductor conductor, Programador programador,
+            Cisterna cisterna, LocalDateTime inicio) {
+        guardar(Atencion.builder().pedido(pedido).conductor(conductor).programador(programador)
+            .cisterna(cisterna).fechaInicioProgramada(inicio).fechaFinProgramada(inicio.plusHours(3))
+            .estado(EstadoAtencion.CANCELADA)
+            .observaciones("Visita cancelada antes de la salida; sin ejecucion real").build());
     }
 
     private Usuario usuario(String cuenta, RolesEnum rol, String password) {

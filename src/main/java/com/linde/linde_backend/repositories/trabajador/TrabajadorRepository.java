@@ -10,6 +10,11 @@ import com.linde.linde_backend.entities.usuario.Usuario;
 import com.linde.linde_backend.utils.Estado;
 
 public interface TrabajadorRepository extends JpaRepository<Trabajador, Integer> {
+    @org.springframework.data.jpa.repository.Query("select count(a) from Atencion a where a.conductor.idTrabajador = :id and a.estado in :estados")
+    long contarAtencionesActivas(@org.springframework.data.repository.query.Param("id") Integer id,
+        @org.springframework.data.repository.query.Param("estados") java.util.Collection<com.linde.linde_backend.utils.atencion.EstadoAtencion> estados);
+
+    Optional<Trabajador> findByUsuario_Correo(String correo);
 
     List<Trabajador> findByEstado(Estado estado);
 

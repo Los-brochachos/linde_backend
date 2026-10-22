@@ -46,7 +46,9 @@ public class PedidoService {
         private final UsuarioRepository usuarioRepository;
         private final PedidoMapper pedidoMapper;
         private final DetallePedidoMapper detallePedidoMapper;
+        private final com.linde.linde_backend.repositories.atencion.AtencionRepository atenciones;
 
+        @Transactional(readOnly = true)
         public List<PedidoResponse> listar() {
                 return pedidoRepository.findAll()
                         .stream()
@@ -244,6 +246,12 @@ public class PedidoService {
                                 "El pedido ya está cancelado");
                 }
 
+                if (pedido.getEstado() != EstadoPedido.RECIBIDO
+                        && pedido.getEstado() != EstadoPedido.EN_PREPARACION) {
+                        throw new IllegalArgumentException("Solo se puede cancelar un pedido RECIBIDO o EN_PREPARACION");
+                }
+
+                cancelarAtencionesPendientes(pedido, request.observacion());
                 pedido.setEstado(EstadoPedido.CANCELADO);
 
                 SeguimientoPedido seguimiento = SeguimientoPedido.builder()
@@ -274,6 +282,12 @@ public class PedidoService {
                         "El pedido ya está cancelado");
                 }
 
+                if (pedido.getEstado() != EstadoPedido.RECIBIDO
+                        && pedido.getEstado() != EstadoPedido.EN_PREPARACION) {
+                        throw new IllegalArgumentException("Solo se puede cancelar un pedido RECIBIDO o EN_PREPARACION");
+                }
+
+                cancelarAtencionesPendientes(pedido, request.observacion());
                 pedido.setEstado(EstadoPedido.CANCELADO);
 
                 SeguimientoPedido seguimiento = SeguimientoPedido.builder()
@@ -286,5 +300,20 @@ public class PedidoService {
                 seguimientoRepository.save(seguimiento);
 
                 return pedidoMapper.toResponse(pedido);
+        }
+        private void cancelarAtencionesPendientes(Pedido pedido, String observacion) {
+                var asociadas = atenciones.findByPedidoIdPedido(pedido.getIdPedido());
+                if (asociadas.stream().anyMatch(a -> a.getEstado()
+                        == com.linde.linde_backend.utils.atencion.EstadoAtencion.EN_CURSO)) {
+                        throw new IllegalArgumentException("No se puede cancelar un pedido con una atención EN_CURSO");
+                }
+                for (var atencion : asociadas) {
+                        if (atencion.getEstado() == com.linde.linde_backend.utils.atencion.EstadoAtencion.PROGRAMADA) {
+                                atencion.setEstado(com.linde.linde_backend.utils.atencion.EstadoAtencion.CANCELADA);
+                                atencion.setObservaciones(observacion == null || observacion.isBlank()
+                                        ? "Cancelada por cancelación del pedido" : observacion.strip());
+                                atenciones.save(atencion);
+                        }
+                }
         }
 }

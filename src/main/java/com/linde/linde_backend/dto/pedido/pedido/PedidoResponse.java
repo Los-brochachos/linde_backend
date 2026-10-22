@@ -12,6 +12,7 @@ public record PedidoResponse(
     EstadoPedido estado,
     LocalDate fechaEntregaEstimada,
     PrioridadPedido prioridad,
-    Integer idCliente
+    Integer idCliente,
+    String razonSocial
 
 ) {}

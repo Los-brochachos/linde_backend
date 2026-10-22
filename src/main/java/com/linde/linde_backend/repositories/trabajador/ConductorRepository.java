@@ -4,11 +4,17 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.linde.linde_backend.entities.trabajador.Conductor;
 import com.linde.linde_backend.utils.Estado;
 
 public interface ConductorRepository extends JpaRepository<Conductor, Integer> {
+    @Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @Query("select c from Conductor c where c.trabajador.usuario.correo = :correo")
+    Optional<Conductor> bloquearPorCorreo(@Param("correo") String correo);
 
     List<Conductor> findByTrabajadorEstado(Estado estado);
 

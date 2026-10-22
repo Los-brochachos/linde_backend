@@ -13,6 +13,8 @@ import com.linde.linde_backend.dto.atencion.atencion.CancelarAtencionRequest;
 import com.linde.linde_backend.entities.atencion.Atencion;
 import com.linde.linde_backend.entities.cisterna.Cisterna;
 import com.linde.linde_backend.entities.pedido.Pedido;
+import com.linde.linde_backend.entities.pedido.SeguimientoPedido;
+import com.linde.linde_backend.repositories.pedido.SeguimientoPedidoRepository;
 import com.linde.linde_backend.entities.trabajador.Conductor;
 import com.linde.linde_backend.entities.trabajador.Programador;
 import com.linde.linde_backend.mappers.atencion.AtencionMapper;
@@ -38,6 +40,7 @@ public class AtencionService {
         private final CisternaRepository cisternaRepository;
         private final ProgramadorRepository programadorRepository;
         private final AtencionMapper mapper;
+        private final SeguimientoPedidoRepository seguimientos;
 
         @org.springframework.transaction.annotation.Transactional(readOnly = true)
         public List<AtencionResponse> listarAsignadas(String correo) {
@@ -61,6 +64,7 @@ public class AtencionService {
                         .stream().map(mapper::toDto).toList();
         }
 
+        @org.springframework.transaction.annotation.Transactional(readOnly = true)
         public List<AtencionResponse> listar() {
 
                 return repository.findAll()
@@ -168,6 +172,8 @@ public class AtencionService {
                 atencion.setEstado(EstadoAtencion.PROGRAMADA);
 
                 Atencion guardada = repository.save(atencion);
+                actualizarPedido(pedido, EstadoPedido.EN_PREPARACION,
+                        "Atención programada: conductor, cisterna y horario asignados");
 
                 return mapper.toDto(guardada);
         }
@@ -225,16 +231,26 @@ public class AtencionService {
         @Transactional
         public AtencionResponse iniciar(Integer id, String correo) {
 
+                // Serializa las aceptaciones del mismo conductor, incluso desde dos pestañas.
+                Conductor conductor = conductorRepository.bloquearPorCorreo(correo)
+                        .orElseThrow(() -> new NoSuchElementException("Conductor no encontrado"));
                 Atencion atencion = asignada(id, correo);
 
                 if (atencion.getEstado() != EstadoAtencion.PROGRAMADA) {
                         throw new IllegalArgumentException("Solo se puede iniciar una atención PROGRAMADA");
                 }
 
+                exigirEstadoPedido(atencion, EstadoPedido.EN_PREPARACION);
+                if (repository.existsByConductor_IdTrabajadorAndEstado(
+                        conductor.getIdTrabajador(), EstadoAtencion.EN_CURSO)) {
+                        throw new IllegalArgumentException("Ya tienes una atención EN_CURSO. Finalízala antes de aceptar otra");
+                }
                 atencion.setEstado(EstadoAtencion.EN_CURSO);
                 atencion.setFechaInicio(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MICROS));
 
                 Atencion actualizada = repository.save(atencion);
+                actualizarPedido(atencion.getPedido(), EstadoPedido.DESPACHADO,
+                        "El conductor inició el recorrido");
 
                 return mapper.toDto(actualizada);
         }
@@ -251,13 +267,31 @@ public class AtencionService {
                     "Solo se puede finalizar una atención EN_CURSO");
         }
 
+        exigirEstadoPedido(atencion, EstadoPedido.DESPACHADO);
         atencion.setEstado(EstadoAtencion.FINALIZADA);
         atencion.setFechaFin(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MICROS));
 
         Atencion actualizada = repository.save(atencion);
+        actualizarPedido(atencion.getPedido(), EstadoPedido.ENTREGADO,
+                "El conductor confirmó la entrega");
 
         return mapper.toDto(actualizada);
     }
+
+        private void exigirEstadoPedido(Atencion atencion, EstadoPedido esperado) {
+                if (atencion.getPedido().getEstado() != esperado) {
+                        throw new IllegalArgumentException("El pedido debe estar " + esperado + " para realizar esta acción");
+                }
+        }
+
+        private void actualizarPedido(Pedido pedido, EstadoPedido estado, String observacion) {
+                if (pedido.getEstado() == estado) return;
+                pedido.setEstado(estado);
+                pedidoRepository.save(pedido);
+                seguimientos.save(SeguimientoPedido.builder().pedido(pedido).estado(estado)
+                        .fechaHora(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MICROS))
+                        .observacion(observacion).build());
+        }
 
         @Transactional
         public AtencionResponse cancelar(Integer id,CancelarAtencionRequest request) {
@@ -272,10 +306,17 @@ public class AtencionService {
                         "Solo se puede cancelar una atención PROGRAMADA");
                 }
 
+                exigirEstadoPedido(atencion, EstadoPedido.EN_PREPARACION);
+                if (request.observaciones() == null || request.observaciones().isBlank()
+                        || request.observaciones().length() > 250) {
+                        throw new IllegalArgumentException("Ingresa un motivo de cancelación de hasta 250 caracteres");
+                }
                 atencion.setEstado(EstadoAtencion.CANCELADA);
-                atencion.setObservaciones(request.observaciones());
+                atencion.setObservaciones(request.observaciones().strip());
 
                 Atencion actualizada = repository.save(atencion);
+                actualizarPedido(atencion.getPedido(), EstadoPedido.RECIBIDO,
+                        request.observaciones().strip());
 
                 return mapper.toDto(actualizada);
         }

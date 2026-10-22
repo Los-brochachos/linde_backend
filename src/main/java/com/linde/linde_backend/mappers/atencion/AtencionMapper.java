@@ -67,7 +67,15 @@ public class AtencionMapper {
                         : null,
                 entity.getProgramador() != null
                         ? entity.getProgramador().getIdTrabajador()
-                        : null
+                        : null,
+                entity.getPedido() != null && entity.getPedido().getCliente() != null
+                        ? entity.getPedido().getCliente().getRazonSocial() : null,
+                entity.getConductor() != null && entity.getConductor().getTrabajador() != null
+                        ? java.util.stream.Stream.of(entity.getConductor().getTrabajador().getNombres(),
+                                entity.getConductor().getTrabajador().getApellidos())
+                                .filter(java.util.Objects::nonNull).collect(java.util.stream.Collectors.joining(" ")) : null,
+                entity.getCisterna() != null
+                        ? entity.getCisterna().getPlaca() + " · " + entity.getCisterna().getNombre() : null
         );
     }
 }

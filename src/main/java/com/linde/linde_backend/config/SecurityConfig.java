@@ -58,6 +58,8 @@ public class SecurityConfig {
                 }))
             .authorizeHttpRequests(auth -> auth
 
+                .requestMatchers(HttpMethod.PATCH, "/api/v1/cuenta/clave").authenticated()
+
                 //ENDPOINTS PUBLICOS - AUTENTICACIÓN
                 .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/refresh-token").permitAll()
@@ -200,7 +202,16 @@ public class SecurityConfig {
                 // =========================================================
                 // TRABAJADORES
 
+                .requestMatchers(HttpMethod.GET, "/api/v1/trabajadores/me")
+                    .hasAnyRole("ADMIN", "ANALISTA", "PROGRAMADOR", "CONDUCTOR", "TECNICO")
+
                 .requestMatchers(HttpMethod.POST, "/api/v1/trabajadores")
+                    .hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/trabajadores/*")
+                    .hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/trabajadores/*")
+                    .hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/v1/trabajadores/*/activar")
                     .hasRole("ADMIN")
 
                 .requestMatchers(HttpMethod.GET, "/api/v1/trabajadores")

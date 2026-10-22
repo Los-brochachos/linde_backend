@@ -24,7 +24,7 @@ class EditarAtencionTest {
     private final AtencionRepository repository = mock(AtencionRepository.class);
     private final ConductorRepository conductores = mock(ConductorRepository.class);
     private final CisternaRepository cisternas = mock(CisternaRepository.class);
-    private final AtencionService service = new AtencionService(repository, null, conductores, cisternas, null, new AtencionMapper());
+    private final AtencionService service = new AtencionService(repository, null, conductores, cisternas, null, new AtencionMapper(), null);
     private final LocalDateTime inicio = LocalDateTime.of(2031, 1, 1, 10, 0);
     private Atencion atencion;
     private Cisterna cisterna;

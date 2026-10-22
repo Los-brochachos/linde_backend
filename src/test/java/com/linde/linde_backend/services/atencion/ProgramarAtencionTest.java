@@ -30,7 +30,8 @@ class ProgramarAtencionTest {
     private final ConductorRepository conductores = mock(ConductorRepository.class);
     private final CisternaRepository cisternas = mock(CisternaRepository.class);
     private final ProgramadorRepository programadores = mock(ProgramadorRepository.class);
-    private final AtencionService service = new AtencionService(repository, pedidos, conductores, cisternas, programadores, new AtencionMapper());
+    private final com.linde.linde_backend.repositories.pedido.SeguimientoPedidoRepository seguimientos = mock(com.linde.linde_backend.repositories.pedido.SeguimientoPedidoRepository.class);
+    private final AtencionService service = new AtencionService(repository, pedidos, conductores, cisternas, programadores, new AtencionMapper(), seguimientos);
     private final LocalDateTime inicio = LocalDateTime.of(2027, 1, 10, 10, 0);
     private final Pedido pedido = Pedido.builder().idPedido(1).estado(EstadoPedido.RECIBIDO).build();
     private AtencionRequest request(LocalDateTime fin) { return new AtencionRequest(1, 2, 3, inicio, fin, null); }
@@ -73,6 +74,9 @@ class ProgramarAtencionTest {
         var resultado = service.crear(request(inicio.plusHours(1)), "p@ejemplo.com");
         assertEquals(EstadoAtencion.PROGRAMADA, resultado.estado());
         assertEquals(1, resultado.idPedido());
+        assertEquals(EstadoPedido.EN_PREPARACION, pedido.getEstado());
+        verify(pedidos).save(pedido);
+        verify(seguimientos).save(argThat(s -> s.getPedido() == pedido && s.getEstado() == EstadoPedido.EN_PREPARACION));
         verify(repository).save(any(Atencion.class));
     }
 }

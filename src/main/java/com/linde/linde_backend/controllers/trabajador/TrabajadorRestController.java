@@ -4,9 +4,12 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +27,29 @@ import lombok.RequiredArgsConstructor;
 public class TrabajadorRestController {
 
     private final TrabajadorService trabajadorService;
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TrabajadorResponse> actualizar(@PathVariable Integer id,
+            @Valid @RequestBody com.linde.linde_backend.dto.trabajador.TrabajadorUpdateRequest request) {
+        return ResponseEntity.ok(trabajadorService.actualizar(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<TrabajadorResponse> desactivar(@PathVariable Integer id,
+            org.springframework.security.core.Authentication authentication) {
+        return ResponseEntity.ok(trabajadorService.cambiarActivo(id, false, authentication.getName()));
+    }
+
+    @PatchMapping("/{id}/activar")
+    public ResponseEntity<TrabajadorResponse> activar(@PathVariable Integer id,
+            org.springframework.security.core.Authentication authentication) {
+        return ResponseEntity.ok(trabajadorService.cambiarActivo(id, true, authentication.getName()));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<TrabajadorResponse> me(org.springframework.security.core.Authentication authentication) {
+        return ResponseEntity.ok(trabajadorService.me(authentication.getName()));
+    }
 
     @GetMapping
     public ResponseEntity<List<TrabajadorResponse>> listarTodos() {

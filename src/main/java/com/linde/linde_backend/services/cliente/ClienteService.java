@@ -69,7 +69,7 @@ public class ClienteService {
 
         // 1. Verificar que el correo no esté registrado
         if (usuarioRepository.findByCorreo(request.correo()).isPresent()) {
-            throw new RuntimeException(
+            throw new IllegalArgumentException(
                     "El correo ya está registrado");
         }
 

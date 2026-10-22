@@ -13,10 +13,17 @@ import com.linde.linde_backend.utils.atencion.EstadoAtencion;
 
 class AtencionConductorTest {
     private final AtencionRepository repository = mock(AtencionRepository.class);
-    private final AtencionService service = new AtencionService(repository, null, null, null, null, new AtencionMapper());
+    private final com.linde.linde_backend.repositories.pedido.SeguimientoPedidoRepository seguimientos = mock(com.linde.linde_backend.repositories.pedido.SeguimientoPedidoRepository.class);
+    private final com.linde.linde_backend.repositories.trabajador.ConductorRepository conductores = mock(com.linde.linde_backend.repositories.trabajador.ConductorRepository.class);
+    @org.junit.jupiter.api.BeforeEach void conductorAutenticado() {
+        when(conductores.bloquearPorCorreo(correo)).thenReturn(Optional.of(com.linde.linde_backend.entities.trabajador.Conductor.builder().idTrabajador(4).build()));
+    }
+    private final AtencionService service = new AtencionService(repository, mock(com.linde.linde_backend.repositories.pedido.PedidoRepository.class), conductores, null, null, new AtencionMapper(), seguimientos);
     private final String correo = "conductor@ejemplo.com";
     private Atencion preparar(EstadoAtencion estado) {
-        var a = Atencion.builder().idAtencion(8).estado(estado).build();
+        var pedido = com.linde.linde_backend.entities.pedido.Pedido.builder().idPedido(1)
+            .estado(estado == EstadoAtencion.PROGRAMADA ? com.linde.linde_backend.utils.pedido.EstadoPedido.EN_PREPARACION : com.linde.linde_backend.utils.pedido.EstadoPedido.DESPACHADO).build();
+        var a = Atencion.builder().idAtencion(8).pedido(pedido).estado(estado).build();
         when(repository.findByIdAtencionAndConductor_Trabajador_Usuario_Correo(8, correo)).thenReturn(Optional.of(a));
         when(repository.save(any(Atencion.class))).thenAnswer(i -> i.getArgument(0));
         return a;
@@ -36,11 +43,13 @@ class AtencionConductorTest {
         verify(repository, never()).save(any());
     }
     @Test void iniciarRegistraEstadoYHora() {
-        preparar(EstadoAtencion.PROGRAMADA);
+        var a = preparar(EstadoAtencion.PROGRAMADA);
         var resultado = service.iniciar(8, correo);
         assertEquals(EstadoAtencion.EN_CURSO, resultado.estado());
         assertNotNull(resultado.fechaInicio());
         assertNull(resultado.fechaFin());
+        assertEquals(com.linde.linde_backend.utils.pedido.EstadoPedido.DESPACHADO, a.getPedido().getEstado());
+        verify(seguimientos).save(argThat(s -> s.getPedido() == a.getPedido() && s.getEstado() == a.getPedido().getEstado()));
     }
     @Test void finalizarRegistraEstadoYConservaInicio() {
         var a = preparar(EstadoAtencion.EN_CURSO);
@@ -49,6 +58,31 @@ class AtencionConductorTest {
         assertEquals(EstadoAtencion.FINALIZADA, resultado.estado());
         assertEquals(inicio, resultado.fechaInicio());
         assertTrue(resultado.fechaFin().isAfter(inicio));
+        assertEquals(com.linde.linde_backend.utils.pedido.EstadoPedido.ENTREGADO, a.getPedido().getEstado());
+        verify(seguimientos).save(argThat(s -> s.getPedido() == a.getPedido() && s.getEstado() == a.getPedido().getEstado()));
+    }
+    @Test void noAceptaOtraMientrasTieneUnRecorridoEnCurso() {
+        var a = preparar(EstadoAtencion.PROGRAMADA);
+        when(repository.existsByConductor_IdTrabajadorAndEstado(4, EstadoAtencion.EN_CURSO)).thenReturn(true);
+        var error = assertThrows(IllegalArgumentException.class, () -> service.iniciar(8, correo));
+        assertTrue(error.getMessage().contains("EN_CURSO"));
+        assertEquals(EstadoAtencion.PROGRAMADA, a.getEstado());
+        assertNull(a.getFechaInicio());
+        verify(repository, never()).save(any());
+        verifyNoInteractions(seguimientos);
+    }
+    @Test void puedeAceptarOtraCuandoYaNoTieneRecorridoEnCurso() {
+        preparar(EstadoAtencion.PROGRAMADA);
+        when(repository.existsByConductor_IdTrabajadorAndEstado(4, EstadoAtencion.EN_CURSO)).thenReturn(false);
+        assertEquals(EstadoAtencion.EN_CURSO, service.iniciar(8, correo).estado());
+        verify(conductores).bloquearPorCorreo(correo);
+    }
+    @Test void noIniciaPedidoCancelado() {
+        var a = preparar(EstadoAtencion.PROGRAMADA);
+        a.getPedido().setEstado(com.linde.linde_backend.utils.pedido.EstadoPedido.CANCELADO);
+        assertThrows(IllegalArgumentException.class, () -> service.iniciar(8, correo));
+        verify(repository, never()).save(any());
+        verifyNoInteractions(seguimientos);
     }
     @Test void noFinalizaSinIniciar() {
         preparar(EstadoAtencion.PROGRAMADA);

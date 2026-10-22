@@ -44,12 +44,13 @@ class PedidoServiceTest {
     @Mock private DetallePedidoRepository detalles;
     @Mock private SeguimientoPedidoRepository seguimientos;
     @Mock private UsuarioRepository usuarios;
+    @Mock private com.linde.linde_backend.repositories.atencion.AtencionRepository atenciones;
     private PedidoService service;
 
     @BeforeEach
     void preparar() {
         service = new PedidoService(pedidos, clientes, productos, detalles, seguimientos,
-            usuarios, new PedidoMapper(), new DetallePedidoMapper());
+            usuarios, new PedidoMapper(), new DetallePedidoMapper(), atenciones);
     }
 
     @Test
@@ -160,7 +161,7 @@ class PedidoServiceTest {
     }
 
     @ParameterizedTest(name = "PD07 - Limite: cancelar pedido {0}")
-    @EnumSource(value = EstadoPedido.class, names = {"ENTREGADO", "CANCELADO"})
+    @EnumSource(value = EstadoPedido.class, names = {"DESPACHADO", "ENTREGADO", "CANCELADO"})
     void cancelarEstadoTerminalFalla(EstadoPedido estado) {
         Pedido pedido = pedido(estado);
         when(pedidos.findById(10)).thenReturn(Optional.of(pedido));
@@ -187,6 +188,55 @@ class PedidoServiceTest {
             () -> service.cancelarMiPedido(10, new CancelarPedidoRequest("Cancelar"), "cliente@linde.example"));
         verifyNoInteractions(seguimientos);
         verify(pedidos, never()).findById(any());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = EstadoPedido.class, names = {"DESPACHADO", "ENTREGADO", "CANCELADO"})
+    void clienteNoPuedeCancelarPedidoDespachadoOTerminal(EstadoPedido estado) {
+        prepararCliente();
+        Pedido pedido = pedido(estado);
+        when(pedidos.findByIdPedidoAndClienteIdCliente(10, 3)).thenReturn(Optional.of(pedido));
+        assertThrows(IllegalArgumentException.class, () -> service.cancelarMiPedido(10,
+            new CancelarPedidoRequest("Cancelar"), "cliente@linde.example"));
+        assertEquals(estado, pedido.getEstado());
+        verifyNoInteractions(seguimientos);
+    }
+
+    @Test void cancelarEnPreparacionCancelaVisitaYConservaMotivo() {
+        Pedido pedido = pedido(EstadoPedido.EN_PREPARACION);
+        var visita = com.linde.linde_backend.entities.atencion.Atencion.builder().pedido(pedido)
+            .estado(com.linde.linde_backend.utils.atencion.EstadoAtencion.PROGRAMADA).build();
+        when(pedidos.findById(10)).thenReturn(Optional.of(pedido));
+        when(atenciones.findByPedidoIdPedido(10)).thenReturn(List.of(visita));
+        service.cancelar(10, new CancelarPedidoRequest("Cambio de necesidad"));
+        assertEquals(EstadoPedido.CANCELADO, pedido.getEstado());
+        assertEquals(com.linde.linde_backend.utils.atencion.EstadoAtencion.CANCELADA, visita.getEstado());
+        assertEquals("Cambio de necesidad", visita.getObservaciones());
+        verify(atenciones).save(visita);
+        verify(seguimientos).save(argThat(s -> s.getEstado() == EstadoPedido.CANCELADO && "Cambio de necesidad".equals(s.getObservacion())));
+    }
+    @Test void clienteCancelaSuPedidoYLaVisitaProgramada() {
+        prepararCliente();
+        Pedido pedido = pedido(EstadoPedido.EN_PREPARACION);
+        var visita = com.linde.linde_backend.entities.atencion.Atencion.builder().pedido(pedido)
+            .estado(com.linde.linde_backend.utils.atencion.EstadoAtencion.PROGRAMADA).build();
+        when(pedidos.findByIdPedidoAndClienteIdCliente(10, 3)).thenReturn(Optional.of(pedido));
+        when(atenciones.findByPedidoIdPedido(10)).thenReturn(List.of(visita));
+        service.cancelarMiPedido(10, new CancelarPedidoRequest("Ya no requerido"), "cliente@linde.example");
+        assertEquals(EstadoPedido.CANCELADO, pedido.getEstado());
+        assertEquals(com.linde.linde_backend.utils.atencion.EstadoAtencion.CANCELADA, visita.getEstado());
+        verify(atenciones).save(visita);
+    }
+    @Test void noCancelaSiExisteVisitaEnCursoAunquePedidoEsteDesactualizado() {
+        Pedido pedido = pedido(EstadoPedido.EN_PREPARACION);
+        var visita = com.linde.linde_backend.entities.atencion.Atencion.builder().pedido(pedido)
+            .estado(com.linde.linde_backend.utils.atencion.EstadoAtencion.EN_CURSO).build();
+        when(pedidos.findById(10)).thenReturn(Optional.of(pedido));
+        when(atenciones.findByPedidoIdPedido(10)).thenReturn(List.of(visita));
+        assertThrows(IllegalArgumentException.class, () -> service.cancelar(10, new CancelarPedidoRequest("Cancelar")));
+        assertEquals(EstadoPedido.EN_PREPARACION, pedido.getEstado());
+        verify(atenciones, never()).save(any());
+        verifyNoInteractions(seguimientos);
     }
 
     private Cliente prepararCliente() {

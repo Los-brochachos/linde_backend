@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.linde.linde_backend.dto.trabajador.TrabajadorCreateRequest;
 import com.linde.linde_backend.dto.trabajador.TrabajadorResponse;
+import com.linde.linde_backend.dto.trabajador.TrabajadorUpdateRequest;
 import com.linde.linde_backend.entities.trabajador.Trabajador;
 import com.linde.linde_backend.entities.usuario.Usuario;
 import com.linde.linde_backend.mappers.trabajador.TrabajadorMapper;
@@ -28,6 +29,14 @@ public class TrabajadorService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional(readOnly = true)
+    public TrabajadorResponse me(String correo) {
+        Trabajador trabajador = trabajadorRepository.findByUsuario_Correo(correo)
+                .orElseThrow(() -> new NoSuchElementException("No se encontró el trabajador asociado a tu cuenta"));
+        return trabajadorMapper.toResponse(trabajador);
+    }
+
+    @Transactional(readOnly = true)
     public List<TrabajadorResponse> listarTodos() {
 
         return trabajadorRepository
@@ -69,14 +78,15 @@ public class TrabajadorService {
         );
     }
 
-    usuarioRepository.findByCorreo(request.correo())
-                .orElseThrow(()-> new IllegalArgumentException("El correo ya está registrado"));
+    if (usuarioRepository.findByCorreo(request.correo()).isPresent()) {
+        throw new IllegalArgumentException("El correo ya está registrado");
+    }
         
     
 
-    trabajadorRepository.findByDni(request.dni()).orElseThrow(()->new IllegalArgumentException(
-                "El DNI ya está registrado"
-        ));
+    if (trabajadorRepository.findByDni(request.dni()).isPresent()) {
+        throw new IllegalArgumentException("El DNI ya está registrado");
+    }
     
 
     Usuario usuario = Usuario.builder()
@@ -103,6 +113,42 @@ public class TrabajadorService {
 
     return trabajadorMapper.toResponse(trabajador);
 }
+    @Transactional
+    public TrabajadorResponse actualizar(Integer id, TrabajadorUpdateRequest request) {
+        Trabajador trabajador = trabajadorRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Trabajador no encontrado"));
+        trabajadorRepository.findByDni(request.dni()).ifPresent(otro -> {
+            if (!otro.getIdTrabajador().equals(id)) throw new IllegalArgumentException("El DNI ya está registrado");
+        });
+        trabajador.setNombres(request.nombres().strip());
+        trabajador.setApellidos(request.apellidos().strip());
+        trabajador.setDni(request.dni());
+        trabajador.setTelefono(request.telefono());
+        trabajador.setDireccion(request.direccion());
+        trabajador.setFechaIngreso(request.fechaIngreso());
+        return trabajadorMapper.toResponse(trabajadorRepository.save(trabajador));
+    }
+
+    @Transactional
+    public TrabajadorResponse cambiarActivo(Integer id, boolean activo, String correoActual) {
+        Trabajador trabajador = trabajadorRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Trabajador no encontrado"));
+        if (!activo && trabajador.getUsuario().getCorreo().equalsIgnoreCase(correoActual)) {
+            throw new IllegalArgumentException("No puedes desactivar tu propia cuenta");
+        }
+        if (!activo && trabajador.getUsuario().getRol() == RolesEnum.CONDUCTOR
+                && trabajadorRepository.contarAtencionesActivas(id, List.of(
+                    com.linde.linde_backend.utils.atencion.EstadoAtencion.PROGRAMADA,
+                    com.linde.linde_backend.utils.atencion.EstadoAtencion.EN_CURSO)) > 0) {
+            throw new IllegalArgumentException("El conductor tiene atenciones activas. Reasígnalas o finalízalas antes de desactivarlo");
+        }
+        Estado estado = activo ? Estado.ACTIVO : Estado.INACTIVO;
+        trabajador.setEstado(estado);
+        trabajador.getUsuario().setEstado(estado);
+        usuarioRepository.save(trabajador.getUsuario());
+        return trabajadorMapper.toResponse(trabajadorRepository.save(trabajador));
+    }
+
     public TrabajadorResponse buscarActivoPorId(Integer id) {
 
         Trabajador trabajador = trabajadorRepository

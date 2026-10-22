@@ -14,16 +14,21 @@ import com.linde.linde_backend.utils.atencion.EstadoAtencion;
 
 class CancelarAtencionTest {
     private final AtencionRepository repository = mock(AtencionRepository.class);
-    private final AtencionService service = new AtencionService(repository, null, null, null, null, new AtencionMapper());
+    private final com.linde.linde_backend.repositories.pedido.PedidoRepository pedidos = mock(com.linde.linde_backend.repositories.pedido.PedidoRepository.class);
+    private final com.linde.linde_backend.repositories.pedido.SeguimientoPedidoRepository seguimientos = mock(com.linde.linde_backend.repositories.pedido.SeguimientoPedidoRepository.class);
+    private final AtencionService service = new AtencionService(repository, pedidos, null, null, null, new AtencionMapper(), seguimientos);
     private final CancelarAtencionRequest request = new CancelarAtencionRequest("Solicitud del cliente");
     @Test void cancelaYGuardaMotivoSinEliminarPedido() {
-        var atencion = Atencion.builder().idAtencion(8).pedido(Pedido.builder().idPedido(11).build()).estado(EstadoAtencion.PROGRAMADA).build();
+        var atencion = Atencion.builder().idAtencion(8).pedido(Pedido.builder().idPedido(11).estado(com.linde.linde_backend.utils.pedido.EstadoPedido.EN_PREPARACION).build()).estado(EstadoAtencion.PROGRAMADA).build();
         when(repository.findById(8)).thenReturn(Optional.of(atencion));
         when(repository.save(any(Atencion.class))).thenAnswer(i -> i.getArgument(0));
         var resultado = service.cancelar(8, request);
         assertEquals(EstadoAtencion.CANCELADA, resultado.estado());
         assertEquals(11, resultado.idPedido());
         assertEquals(request.observaciones(), resultado.observaciones());
+        assertEquals(com.linde.linde_backend.utils.pedido.EstadoPedido.RECIBIDO, atencion.getPedido().getEstado());
+        verify(pedidos).save(atencion.getPedido());
+        verify(seguimientos).save(argThat(s -> s.getPedido() == atencion.getPedido() && s.getEstado() == com.linde.linde_backend.utils.pedido.EstadoPedido.RECIBIDO && request.observaciones().equals(s.getObservacion())));
         verify(repository).save(atencion); verify(repository, never()).delete(any());
     }
     @Test void noCancelaAtencionesIniciadasFinalizadasOCanceladas() {
