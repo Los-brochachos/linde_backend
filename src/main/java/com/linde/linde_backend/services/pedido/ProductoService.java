@@ -1,14 +1,16 @@
 package com.linde.linde_backend.services.pedido;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.linde.linde_backend.dto.pedido.ProductoRequest;
-import com.linde.linde_backend.dto.pedido.ProductoResponse;
+import com.linde.linde_backend.dto.pedido.producto.ProductoCreateRequest;
+import com.linde.linde_backend.dto.pedido.producto.ProductoResponse;
+import com.linde.linde_backend.dto.pedido.producto.ProductoUpdateRequest;
 import com.linde.linde_backend.entities.pedido.Producto;
-import com.linde.linde_backend.mapper.pedido.ProductoMapper;
+import com.linde.linde_backend.mappers.pedido.ProductoMapper;
 import com.linde.linde_backend.repositories.pedido.ProductoRepository;
 import com.linde.linde_backend.utils.Estado;
 
@@ -21,7 +23,7 @@ public class ProductoService {
     private final ProductoRepository productoRepository;
     private final ProductoMapper productoMapper;
 
-    public List<ProductoResponse> listar() {
+    public List<ProductoResponse> listarTodos() {
 
         return productoRepository.findAll()
                 .stream()
@@ -29,40 +31,91 @@ public class ProductoService {
                 .toList();
     }
 
+    public List<ProductoResponse> listarActivos() {
+
+        return productoRepository
+                .findByEstado(Estado.ACTIVO)
+                .stream()
+                .map(productoMapper::toResponse)
+                .toList();
+    }
+
     public ProductoResponse buscarPorId(Integer id) {
 
-        Producto producto = productoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(
-                        "Producto no encontrado"
-                ));
+        Producto producto = productoRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new NoSuchElementException("Producto no encontrado"));
+
+        return productoMapper.toResponse(producto);
+    }
+
+    public ProductoResponse buscarActivoPorId(Integer id) {
+
+        Producto producto = productoRepository
+                .findByIdProductoAndEstado(id, Estado.ACTIVO)
+                .orElseThrow(() ->
+                        new NoSuchElementException("Producto no encontrado"));
 
         return productoMapper.toResponse(producto);
     }
 
     @Transactional
-    public ProductoResponse insertar(ProductoRequest request) {
+    public ProductoResponse crearProducto(
+            ProductoCreateRequest request) {
+
+        if (productoRepository
+                .findByNombre(request.nombre())
+                .isPresent()) {
+
+            throw new IllegalArgumentException(
+                    "Ya existe un producto con ese nombre");
+        }
 
         Producto producto = productoMapper.toEntity(request);
 
+        producto.setEstado(Estado.ACTIVO);
+
         producto = productoRepository.save(producto);
 
         return productoMapper.toResponse(producto);
     }
 
     @Transactional
-    public ProductoResponse actualizar(
+    public ProductoResponse actualizarProducto(
             Integer id,
-            ProductoRequest request) {
+            ProductoUpdateRequest request) {
 
-        Producto producto = productoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(
-                        "Producto no encontrado"
-                ));
+        Producto producto = productoRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new NoSuchElementException("Producto no encontrado"));
 
-        producto.setNombre(request.nombre());
-        producto.setTipoGas(request.tipoGas());
-        producto.setUnidadMedida(request.unidadMedida());
-        producto.setPrecioUnitario(request.precioUnitario());
+        if (request.nombre() != null
+                && !producto.getNombre().equals(request.nombre())
+                && productoRepository
+                        .findByNombre(request.nombre())
+                        .isPresent()) {
+
+            throw new IllegalArgumentException(
+                    "Ya existe un producto con ese nombre");
+        }
+
+        if (request.nombre() != null) {
+            producto.setNombre(request.nombre());
+        }
+
+        if (request.tipoGas() != null) {
+            producto.setTipoGas(request.tipoGas());
+        }
+
+        if (request.unidadMedida() != null) {
+            producto.setUnidadMedida(request.unidadMedida());
+        }
+
+        if (request.precioUnitario() != null) {
+            producto.setPrecioUnitario(request.precioUnitario());
+        }
 
         producto = productoRepository.save(producto);
 
@@ -70,18 +123,12 @@ public class ProductoService {
     }
 
     @Transactional
-    public void desactivar(Integer id) {
+    public void eliminarProducto(Integer id) {
 
-        Producto producto = productoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(
-                        "Producto no encontrado"
-                ));
-
-        if (producto.getEstado() == Estado.INACTIVO) {
-            throw new RuntimeException(
-                    "El producto ya está inactivo"
-            );
-        }
+        Producto producto = productoRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new NoSuchElementException("Producto no encontrado"));
 
         producto.setEstado(Estado.INACTIVO);
 

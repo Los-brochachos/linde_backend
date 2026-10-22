@@ -6,16 +6,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.linde.linde_backend.dto.usuario.UsuarioResponse;
 import com.linde.linde_backend.dto.usuario.UsuarioUpdateRequest;
-import com.linde.linde_backend.entities.usuario.Usuario;
-import com.linde.linde_backend.repositories.usuario.UsuarioRepository;
 import com.linde.linde_backend.services.usuario.UsuarioService;
 
 import jakarta.validation.Valid;
@@ -27,11 +25,9 @@ import lombok.RequiredArgsConstructor;
 public class UsuarioRestController {
 
     private final UsuarioService service;
-    private final UsuarioRepository repository;
 
     @GetMapping
     public ResponseEntity<List<UsuarioResponse>> findAll() {
-
         return ResponseEntity.ok(service.findAll());
     }
 
@@ -46,13 +42,22 @@ public class UsuarioRestController {
     public ResponseEntity<UsuarioResponse> me(
             Authentication authentication) {
 
-        Usuario usuario = repository.findByCorreo(authentication.getName())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        return ResponseEntity.ok(service.findById(usuario.getIdUsuario()));
+        return ResponseEntity.ok(
+                service.me(authentication.getName())
+        );
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping ("/me")
+    public ResponseEntity<UsuarioResponse> actualizarMe(
+            Authentication authentication,
+            @Valid @RequestBody UsuarioUpdateRequest request) {
+
+        return ResponseEntity.ok(
+                service.actualizarMe(authentication.getName(), request)
+        );
+    }
+
+    @PatchMapping("/{id}")
     public ResponseEntity<UsuarioResponse> actualizar(
             @PathVariable Integer id,
             @Valid @RequestBody UsuarioUpdateRequest request) {

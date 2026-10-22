@@ -12,4 +12,5 @@ public interface SeguimientoPedidoRepository
     List<SeguimientoPedido> findByPedidoIdPedidoOrderByFechaHoraAsc(
             Integer idPedido
     );
+
 }

@@ -15,7 +15,6 @@ public record TrabajadorResponse(
     String direccion,
     LocalDate fechaIngreso,
     Estado estado,
-    Integer idUsuario,
     String correo,
     RolesEnum rol
 

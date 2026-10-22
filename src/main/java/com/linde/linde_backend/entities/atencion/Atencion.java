@@ -6,9 +6,12 @@ import com.linde.linde_backend.entities.cisterna.Cisterna;
 import com.linde.linde_backend.entities.pedido.Pedido;
 import com.linde.linde_backend.entities.trabajador.Conductor;
 import com.linde.linde_backend.entities.trabajador.Programador;
+import com.linde.linde_backend.utils.atencion.EstadoAtencion;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,39 +25,51 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity 
+@Entity
 @Getter
-@Setter 
-@Builder 
-@Table (name="atencion")
-@NoArgsConstructor 
-@AllArgsConstructor 
+@Setter
+@Builder
+@Table(name = "atencion")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Atencion {
-    @Id 
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idAtencion;
-    @Column (nullable = false)
+
+    @Column(nullable = false)
     private LocalDateTime fechaInicioProgramada;
+
     @Column
     private LocalDateTime fechaFinProgramada;
+
     @Column
     private LocalDateTime fechaInicio;
+
     @Column
     private LocalDateTime fechaFin;
-    @Column (nullable = false, length = 50)
-    private String estado; 
-    @Column (length = 250)
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private EstadoAtencion estado;
+
+    @Column(length = 250)
     private String observaciones;
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn (name ="idPedido",nullable = false)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idPedido", nullable = false)
     private Pedido pedido;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn (name="idConductor", nullable = false)
+    @JoinColumn(name = "idConductor", nullable = false)
     private Conductor conductor;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn (name = "idCisterna", nullable = false)
+    @JoinColumn(name = "idCisterna", nullable = false)
     private Cisterna cisterna;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn (name = "idProgramador", nullable = false)
+    @JoinColumn(name = "idProgramador", nullable = false)
     private Programador programador;
 }

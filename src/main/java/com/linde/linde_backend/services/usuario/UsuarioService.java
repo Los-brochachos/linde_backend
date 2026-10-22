@@ -1,6 +1,7 @@
 package com.linde.linde_backend.services.usuario;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.linde.linde_backend.dto.usuario.UsuarioResponse;
 import com.linde.linde_backend.dto.usuario.UsuarioUpdateRequest;
 import com.linde.linde_backend.entities.usuario.Usuario;
-import com.linde.linde_backend.mapper.usuario.UsuarioMapper;
+import com.linde.linde_backend.mappers.usuario.UsuarioMapper;
 import com.linde.linde_backend.repositories.usuario.UsuarioRepository;
 import com.linde.linde_backend.utils.Estado;
 
@@ -28,7 +29,7 @@ public class UsuarioService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         return repository.findByCorreo(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
     }
 
     public List<UsuarioResponse> findAll() {
@@ -42,7 +43,7 @@ public class UsuarioService implements UserDetailsService {
     public UsuarioResponse findById(Integer id) {
 
         Usuario usuario = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado"));
 
         return mapper.toResponse(usuario);
     }
@@ -51,18 +52,36 @@ public class UsuarioService implements UserDetailsService {
     public UsuarioResponse actualizar(Integer id, UsuarioUpdateRequest request) {
 
         Usuario usuario = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado"));
 
         if (!usuario.getCorreo().equals(request.correo())
                 && repository.findByCorreo(request.correo()).isPresent()) {
 
-            throw new RuntimeException("El correo ya está registrado");
+            throw new IllegalArgumentException("El correo ya está registrado");
         }
 
         usuario.setCorreo(request.correo());
-        usuario.setEstado(request.estado());
-
         usuario = repository.save(usuario);
+
+        return mapper.toResponse(usuario);
+    }
+
+    @Transactional
+    public UsuarioResponse actualizarMe(
+            String correoActual,
+            UsuarioUpdateRequest request) {
+
+        Usuario usuario = repository.findByCorreo(correoActual)
+                .orElseThrow(() ->
+                        new NoSuchElementException("Usuario no encontrado"));
+
+        if (!usuario.getCorreo().equals(request.correo())
+                && repository.findByCorreo(request.correo()).isPresent()) {
+
+            throw new IllegalArgumentException("El correo ya está registrado");
+        }
+
+        usuario.setCorreo(request.correo());
 
         return mapper.toResponse(usuario);
     }
@@ -71,7 +90,7 @@ public class UsuarioService implements UserDetailsService {
     public void desactivar(Integer id) {
 
         Usuario usuario = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado"));
 
         usuario.setEstado(Estado.INACTIVO);
 
@@ -80,7 +99,7 @@ public class UsuarioService implements UserDetailsService {
 
     public UsuarioResponse me(String correo) {
 
-        Usuario usuario = repository.findByCorreo(correo).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        Usuario usuario = repository.findByCorreo(correo).orElseThrow(() -> new NoSuchElementException("Usuario no encontrado"));
         return mapper.toResponse(usuario);
 
     }

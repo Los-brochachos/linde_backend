@@ -2,7 +2,7 @@ package com.linde.linde_backend.entities.pedido;
 
 import java.time.LocalDateTime;
 
-import com.linde.linde_backend.utils.EstadoPedido;
+import com.linde.linde_backend.utils.pedido.EstadoPedido;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

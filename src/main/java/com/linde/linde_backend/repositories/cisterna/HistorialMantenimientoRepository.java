@@ -8,23 +8,45 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.linde.linde_backend.entities.cisterna.HistorialMantenimiento;
 
-public interface HistorialMantenimientoRepository extends JpaRepository<HistorialMantenimiento, Integer>{
-    @EntityGraph(attributePaths = {"cisterna", "tecnico"})
-    List<HistorialMantenimiento> findByCisterna_IdCisterna(Integer idCisterna);
+public interface HistorialMantenimientoRepository extends JpaRepository<HistorialMantenimiento, Integer> {
+
+    @EntityGraph(attributePaths = {
+            "falla",
+            "falla.cisterna",
+            "falla.tecnico"
+    })
+    List<HistorialMantenimiento> findByFalla_Cisterna_IdCisterna(
+            Integer idCisterna
+    );
 
     @Override
-    @EntityGraph(attributePaths = {"cisterna", "tecnico"})
+    @EntityGraph(attributePaths = {
+            "falla",
+            "falla.cisterna",
+            "falla.tecnico"
+    })
     List<HistorialMantenimiento> findAll();
 
     /**
-     * Devuelve los datos del historial de mantenimiento de la fecha indicada
-     * @param fecha fecha de búsqueda
-     * @return datos del historial registrados en la fecha indicada
+     * Devuelve los historiales de mantenimiento registrados
+     * dentro del rango de fecha y hora indicado.
      */
-    @EntityGraph(attributePaths = {"cisterna", "tecnico"})
-    List<HistorialMantenimiento> findByFechaBetween(LocalDateTime inicio, LocalDateTime fin);
+    @EntityGraph(attributePaths = {
+            "falla",
+            "falla.cisterna",
+            "falla.tecnico"
+    })
+    List<HistorialMantenimiento> findByFechaGreaterThanEqualAndFechaLessThan(
+            LocalDateTime inicio,
+            LocalDateTime fin
+    );
 
-    @EntityGraph(attributePaths = {"cisterna", "tecnico"})
-    List<HistorialMantenimiento> findByCisterna_Nombre(String nombre);
-
+    @EntityGraph(attributePaths = {
+            "falla",
+            "falla.cisterna",
+            "falla.tecnico"
+    })
+    List<HistorialMantenimiento> findByFalla_Cisterna_Nombre(
+            String nombre
+    );
 }

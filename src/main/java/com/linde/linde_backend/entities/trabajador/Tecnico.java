@@ -1,7 +1,12 @@
 package com.linde.linde_backend.entities.trabajador;
 
+import com.linde.linde_backend.utils.trabajador.EspecialidadTecnico;
+import com.linde.linde_backend.utils.trabajador.NivelTecnico;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -28,10 +33,13 @@ public class Tecnico {
     @MapsId 
     @JoinColumn (name = "idTrabajador")
     private Trabajador trabajador;
-    @Column (nullable = false, length = 100)
-    private String especialidad;
-    @Column (nullable = false, length = 50)
-    private String nivelTecnico;
-    @Column (nullable = false, length = 100)
-    private String certificacion;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 50)
+    private EspecialidadTecnico especialidad;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 15)
+    private NivelTecnico nivelTecnico;
+    
 }

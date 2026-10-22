@@ -1,65 +1,57 @@
 package com.linde.linde_backend.services;
 
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import com.linde.linde_backend.entities.usuario.Usuario;
+import org.springframework.transaction.annotation.Transactional;
 import com.linde.linde_backend.repositories.usuario.UsuarioRepository;
-import com.linde.linde_backend.utils.AuthRequest;
-import com.linde.linde_backend.utils.AuthResponse;
-import com.linde.linde_backend.utils.Estado;
-import com.linde.linde_backend.utils.RefreshTokenRequest;
-import com.linde.linde_backend.utils.RegisterRequest;
-import com.linde.linde_backend.utils.RegisterResponse;
-import com.linde.linde_backend.utils.RolesEnum;
-
+import com.linde.linde_backend.utils.auth.AuthRequest;
+import com.linde.linde_backend.utils.auth.AuthTokens;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 
-@Service 
-@RequiredArgsConstructor 
+@Service
+@RequiredArgsConstructor
 public class AuthService {
-
   private final TokenService tokenService;
   private final UsuarioRepository userRepository;
-  private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
 
-  public RegisterResponse register(RegisterRequest request) {
-    if (userRepository.findByCorreo(request.correo()).isPresent()) {
-      return new RegisterResponse(request.correo(), "ADVERTENCIA", "El usuario ya esta registrado.");
-    }
-    var user = Usuario.builder()
-        .correo(request.correo())
-        .contraseña(passwordEncoder.encode(request.contraseña()))
-        .rol(RolesEnum.CLIENTE)
-        .estado(Estado.ACTIVO)
-        .build();
-    userRepository.save(user).getCorreo();
-    return new RegisterResponse(request.correo(), "INFORMACIÓN", "Nuevo usuario registrado.");
+  @Transactional
+  public AuthTokens authenticate(AuthRequest request) {
+    authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.correo(), request.contraseña()));
+    var user = userRepository.findByCorreo(request.correo())
+        .orElseThrow(() -> new BadCredentialsException("Credenciales invalidas"));
+    if (!user.isEnabled()) throw new BadCredentialsException("Credenciales invalidas");
+    return issue(user);
   }
 
-  public AuthResponse authenticate(AuthRequest request) {
-    authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(request.correo(), request.contraseña()));
-    var user = userRepository.findByCorreo(request.correo()).orElseThrow();
-    var jwtToken = jwtService.generateToken(user);
-    var refreshToken = jwtService.generateRefreshToken(user);
-    tokenService.saveTokens(user,jwtToken,refreshToken);
-    return new AuthResponse(jwtToken, refreshToken);
+  @Transactional
+  public AuthTokens refreshToken(String refreshToken) {
+    try {
+      String email = jwtService.extractUsername(refreshToken);
+      var user = userRepository.findByCorreo(email)
+          .orElseThrow(() -> new BadCredentialsException("Sesion invalida"));
+      if (!jwtService.isRefreshTokenValid(refreshToken, user)) throw new BadCredentialsException("Sesion invalida");
+      var owner = tokenService.consumeRefreshToken(refreshToken);
+      if (!user.getIdUsuario().equals(owner.getIdUsuario())) throw new BadCredentialsException("Sesion invalida");
+      return issue(user);
+    } catch (JwtException | IllegalArgumentException ex) {
+      throw new BadCredentialsException("Sesion invalida", ex);
+    }
   }
 
-  public AuthResponse refreshToken(RefreshTokenRequest request) {
-    String userEmail = jwtService.extractUsername(request.refreshToken());
-    if (userEmail != null) {
-      var user = userRepository.findByCorreo(userEmail).orElseThrow();
-      if (jwtService.isTokenValid(request.refreshToken(), user)) {
-        var accessToken = jwtService.generateToken(user);
-        return new AuthResponse(accessToken, request.refreshToken());
-      }
-    }
-    throw new RuntimeException("INVALIDO Refresh Token");
+  @Transactional
+  public void logout(String refreshToken) {
+    tokenService.revokeRefreshToken(refreshToken);
+  }
+
+  private AuthTokens issue(com.linde.linde_backend.entities.usuario.Usuario user) {
+    String access = jwtService.generateToken(user);
+    String refresh = jwtService.generateRefreshToken(user);
+    tokenService.saveRefreshToken(user, refresh);
+    return new AuthTokens(access, refresh);
   }
 }
