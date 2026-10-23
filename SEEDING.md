@@ -16,17 +16,17 @@ de la aplicacion. Usa una base de desarrollo vacia con el esquema actual.
 
 ## Cuentas
 
-Todas usan la clave de desarrollo `Linde1234*`, almacenada con el PasswordEncoder
+Todas usan la clave de desarrollo `without1234*`, almacenada con el PasswordEncoder
 del proyecto (BCrypt). Los correos son ficticios:
 
 | Rol | Correo |
 | --- | --- |
-| ADMIN | admin@linde.example |
-| ANALISTA | analista@linde.example |
-| CONDUCTOR | conductor1@linde.example a conductor5@linde.example |
-| PROGRAMADOR | programador1@linde.example a programador5@linde.example |
-| TECNICO | tecnico1@linde.example a tecnico5@linde.example |
-| CLIENTE | cliente1@linde.example a cliente5@linde.example |
+| ADMIN | admin@without.example |
+| ANALISTA | analista@without.example |
+| CONDUCTOR | conductor1@without.example a conductor5@without.example |
+| PROGRAMADOR | programador1@without.example a programador5@without.example |
+| TECNICO | tecnico1@without.example a tecnico5@without.example |
+| CLIENTE | cliente1@without.example a cliente5@without.example |
 
 Se crean 178 registros: 22 usuarios, 17 trabajadores, 5 conductores, 5 programadores,
 5 tecnicos, 5 clientes, 5 cisternas, 5 productos, 15 pedidos, 15 detalles,
@@ -52,5 +52,5 @@ actuales antes de ejecutar la carga. Otra opcion es apuntar a una nueva base de
 desarrollo vacia para que Hibernate cree las tablas actuales. No ejecutes el dump
 antiguo sobre esa base. El seeder no cambia el esquema.
 
-`src/main/resources/datalinde.sql` es un script anterior independiente; no es
+`src/main/resources/datawithout.sql` es un script anterior independiente; no es
 necesario ejecutarlo junto con este seeder.

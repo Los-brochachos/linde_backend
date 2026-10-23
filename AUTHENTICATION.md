@@ -1,7 +1,7 @@
 # Autenticacion para Angular
 
 El backend ahora devuelve un access token de 15 minutos en JSON y envia un
-refresh token de 30 dias en la cookie `linde_refresh`. Angular debe conservar
+refresh token de 30 dias en la cookie `without_refresh`. Angular debe conservar
 el access en memoria. El refresh no aparece en JSON ni se lee desde JavaScript.
 
 ## Contrato y orden de llamadas
@@ -39,7 +39,7 @@ El backend usa errores genericos 401 para no revelar detalles de autenticacion.
 
 ## Cookies y CSRF
 
-`linde_refresh`: `HttpOnly`, `Path=/auth`, `SameSite=Strict` y `Secure` por defecto.
+`without_refresh`: `HttpOnly`, `Path=/auth`, `SameSite=Strict` y `Secure` por defecto.
 No se configura Domain. La cookie CSRF tambien es HttpOnly y se limita a `/auth`;
 el frontend obtiene el token CSRF desde el cuerpo de GET `/auth/csrf`.
 

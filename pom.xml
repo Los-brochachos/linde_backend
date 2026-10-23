@@ -8,10 +8,10 @@
 		<version>4.1.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.linde</groupId>
-	<artifactId>linde_backend</artifactId>
+	<groupId>com.without</groupId>
+	<artifactId>without_backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>linde_backend</name>
+	<name>without_backend</name>
 	<description/>
 	<url/>
 	<licenses>

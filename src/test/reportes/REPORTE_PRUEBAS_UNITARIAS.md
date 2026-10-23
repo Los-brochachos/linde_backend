@@ -1,6 +1,6 @@
 # Reporte de pruebas unitarias
 
-Proyecto: Linde Backend. Fecha de ejecucion: 18 de octubre de 2026.
+Proyecto: without Backend. Fecha de ejecucion: 18 de octubre de 2026.
 
 ## Objetivo y componentes seleccionados
 

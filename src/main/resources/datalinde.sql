@@ -1,4 +1,4 @@
-USE lindedb;
+USE withoutdb;
 
 START TRANSACTION;
 
@@ -9,31 +9,31 @@ START TRANSACTION;
 INSERT INTO usuario
 (id_usuario, correo, contraseña, estado, rol)
 VALUES
-(1,  'cliente1@linde.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CLIENTE'),
-(2,  'cliente2@linde.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CLIENTE'),
-(3,  'cliente3@linde.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CLIENTE'),
-(4,  'cliente4@linde.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CLIENTE'),
-(5,  'cliente5@linde.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CLIENTE'),
+(1,  'cliente1@without.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CLIENTE'),
+(2,  'cliente2@without.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CLIENTE'),
+(3,  'cliente3@without.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CLIENTE'),
+(4,  'cliente4@without.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CLIENTE'),
+(5,  'cliente5@without.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CLIENTE'),
 
-(6,  'conductor1@linde.com',   '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CONDUCTOR'),
-(7,  'conductor2@linde.com',   '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CONDUCTOR'),
-(8,  'conductor3@linde.com',   '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CONDUCTOR'),
-(9,  'conductor4@linde.com',   '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CONDUCTOR'),
-(10, 'conductor5@linde.com',   '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CONDUCTOR'),
+(6,  'conductor1@without.com',   '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CONDUCTOR'),
+(7,  'conductor2@without.com',   '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CONDUCTOR'),
+(8,  'conductor3@without.com',   '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CONDUCTOR'),
+(9,  'conductor4@without.com',   '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CONDUCTOR'),
+(10, 'conductor5@without.com',   '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'CONDUCTOR'),
 
-(11, 'tecnico1@linde.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'TECNICO'),
-(12, 'tecnico2@linde.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'TECNICO'),
-(13, 'tecnico3@linde.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'TECNICO'),
-(14, 'tecnico4@linde.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'TECNICO'),
-(15, 'tecnico5@linde.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'TECNICO'),
+(11, 'tecnico1@without.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'TECNICO'),
+(12, 'tecnico2@without.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'TECNICO'),
+(13, 'tecnico3@without.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'TECNICO'),
+(14, 'tecnico4@without.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'TECNICO'),
+(15, 'tecnico5@without.com',     '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'TECNICO'),
 
-(16, 'programador1@linde.com', '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'PROGRAMADOR'),
-(17, 'programador2@linde.com', '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'PROGRAMADOR'),
-(18, 'programador3@linde.com', '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'PROGRAMADOR'),
-(19, 'programador4@linde.com', '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'PROGRAMADOR'),
-(20, 'programador5@linde.com', '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'PROGRAMADOR'),
+(16, 'programador1@without.com', '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'PROGRAMADOR'),
+(17, 'programador2@without.com', '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'PROGRAMADOR'),
+(18, 'programador3@without.com', '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'PROGRAMADOR'),
+(19, 'programador4@without.com', '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'PROGRAMADOR'),
+(20, 'programador5@without.com', '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'PROGRAMADOR'),
 
-(21, 'admin@linde.com',        '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'ADMIN');
+(21, 'admin@without.com',        '$2a$10$z3njX9A5cqUax4LTn18vgO/7mY69Xk21sK8ekdFctpds96obpDyX2', 'ACTIVO', 'ADMIN');
 
 
 -- =========================================================
@@ -43,19 +43,19 @@ VALUES
 INSERT INTO cliente
 (id_cliente, id_usuario, ruc, telefono, correo, razon_social, direccion)
 VALUES
-(1, 1, '20123456781', '987654321', 'cliente1@linde.com',
+(1, 1, '20123456781', '987654321', 'cliente1@without.com',
  'Hospital San Marcos S.A.C.', 'Av. Universitaria 1001, Lima'),
 
-(2, 2, '20234567892', '987654322', 'cliente2@linde.com',
+(2, 2, '20234567892', '987654322', 'cliente2@without.com',
  'Clinica Vida Salud S.A.C.', 'Av. Brasil 1250, Lima'),
 
-(3, 3, '20345678903', '987654323', 'cliente3@linde.com',
+(3, 3, '20345678903', '987654323', 'cliente3@without.com',
  'Industrias del Pacifico S.A.', 'Av. Argentina 2200, Lima'),
 
-(4, 4, '20456789014', '987654324', 'cliente4@linde.com',
+(4, 4, '20456789014', '987654324', 'cliente4@without.com',
  'Laboratorios Andinos S.A.C.', 'Av. Arequipa 1800, Lima'),
 
-(5, 5, '20567890125', '987654325', 'cliente5@linde.com',
+(5, 5, '20567890125', '987654325', 'cliente5@without.com',
  'Metalurgica Nacional S.A.', 'Av. Nestor Gambetta 1500, Callao');
 
 
@@ -401,27 +401,27 @@ VALUES
 (1, '2026-09-18', '2026-09-22', 1, 'T001-000001',
  'Entrega de oxigeno medicinal',
  'Hospital San Marcos S.A.C.',
- 'Planta Linde Lima'),
+ 'Planta without Lima'),
 
 (2, '2026-09-18', '2026-09-23', 2, 'T001-000002',
  'Entrega de oxigeno industrial',
  'Clinica Vida Salud S.A.C.',
- 'Planta Linde Lima'),
+ 'Planta without Lima'),
 
 (3, '2026-09-19', '2026-09-24', 3, 'T001-000003',
  'Entrega de nitrogeno industrial',
  'Industrias del Pacifico S.A.',
- 'Planta Linde Callao'),
+ 'Planta without Callao'),
 
 (4, '2026-09-19', '2026-09-20', 4, 'T001-000004',
  'Entrega de argon industrial',
  'Laboratorios Andinos S.A.C.',
- 'Planta Linde Lima'),
+ 'Planta without Lima'),
 
 (5, '2026-09-20', '2026-09-26', 5, 'T001-000005',
  'Entrega de dioxido de carbono',
  'Metalurgica Nacional S.A.',
- 'Planta Linde Callao');
+ 'Planta without Callao');
 
 
 -- =========================================================
